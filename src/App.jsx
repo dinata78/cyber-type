@@ -82,10 +82,12 @@ function App() {
 
       {
         gameState === "lobby" ?
-          <button onClick={() => {
-            setGameState("idle")
-            console.log("Game state set to 'idle'")
-            }}>
+          <button
+            onClick={() => {
+              setGameState("idle")
+              console.log("Game state set to 'idle'")
+            }}
+          >
             Start Game
           </button>
         : <>
@@ -105,15 +107,30 @@ function App() {
               }
             </div>
 
-            <GameInput
-              typed={typed}
-              onChange={handleInputChange}
-              isDisabled={gameState === "finished"}
-            />
+            {
+              gameState !== "finished" &&
+              <GameInput
+                typed={typed}
+                onChange={handleInputChange}
+                isDisabled={gameState === "finished"}
+              />
+            }
             
             <div>
               Speed (WPM): {gameState === "finished" ? finalWpm : liveWpm}
             </div>
+
+            {
+              gameState === "finished" &&
+              <button
+                onClick={() => {
+                  setGameState("idle");
+                  setFinalWpm("0");
+                }}
+              >
+                Restart Test
+              </button>
+            }
 
           </>
       }
