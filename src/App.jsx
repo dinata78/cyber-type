@@ -1,43 +1,69 @@
 import { useEffect, useRef, useState } from "react"
 import "./index.css"
-import { Letter } from "./Letter";
 import { GameInput } from "./GameInput";
+import { Word } from "./Word";
 
 function App() {
   const [ gameState, setGameState ] = useState("lobby");
-  const [ typed, setTyped ] = useState("");
+  const [ committedWords, setCommittedWords ] = useState([]);
+  const [ typedWord, setTypedWord ] = useState("");
   const [ timeElapsed, setTimeElapsed ] = useState(0);
   const [ finalWpm, setFinalWpm ] = useState(0);
 
   const target = "I don't really know yet, so please don't ask me.";
-  const targetArray = target.split("");
+  const targetWords = target.split(" "); 
 
   const timerId = useRef(null);
 
+  const currentWordIndex = committedWords.length;
+  const currentLetterIndex = typedWord.length;
+
   const handleInputChange = (e) => {
-    if (gameState === "finished") return;
-
     const value = e.target.value;
+    const word = value.trim();
 
-    setTyped(value);
+    if (
+      gameState === "finished" ||
+      word.length > targetWords[currentWordIndex].length
+    ) return;
 
-    if (gameState === "idle" && value.length === 1) {
+
+    if (value.endsWith(" ")) {
+      if (word === targetWords[currentWordIndex]) {
+        setCommittedWords(prev => [...prev, word]);
+        setTypedWord("");
+      }
+    }
+    else {
+      setTypedWord(value);
+    }
+
+    if (gameState === "idle" && word.length === 1) {
       console.log("First letter typed.");
       setGameState("running");
       console.log("Game state set to 'running'");
     }
   }
 
-  const getTypingSpeed = (typed, timeElapsed) => {
+  const handleRestartClick = () => {
+    setFinalWpm(0);
+    console.log("Cleared final WPM");
+    setGameState("idle");
+    console.log("Game state set to 'idle'");
+  }
+
+  const getTypingSpeed = (committedWords, typedWord, timeElapsed) => {
     if (timeElapsed <= 0) return 0;
 
-    const wordsTyped = typed.length / 5;
-    const wpm = Math.round((wordsTyped / timeElapsed) * 60 * 100) / 100;
+    const words = [...committedWords, typedWord].join(" ");
+
+    const wordsTypedAdjusted = words.length / 5;
+    const wpm = Math.round((wordsTypedAdjusted / timeElapsed) * 60 * 100) / 100;
 
     return wpm;
   }
 
-  const liveWpm = getTypingSpeed(typed, timeElapsed);
+  const liveWpm = getTypingSpeed(committedWords, typedWord, timeElapsed);
 
   useEffect(() => {
     if (gameState !== "running") return;
@@ -52,6 +78,8 @@ function App() {
       setTimeElapsed(timePassedInSeconds);
     }, 128);
 
+    console.log("Started timer.")
+
     return () => clearInterval(timerId.current);
   }, [gameState]);
 
@@ -62,19 +90,26 @@ function App() {
     console.log("Stopped timer.")
     setFinalWpm(liveWpm);
     console.log("Stored final WPM.");
-    setTyped("");
-    console.log("Cleared input's value.");
+    setCommittedWords([]);
+    console.log("Cleared committed words.");
+    setTypedWord("");
+    console.log("Cleared typed word.");
     setTimeElapsed(0);
     console.log("Cleared time elapsed.");
   }, [gameState]);
 
   useEffect(() => {
-    if (typed === target) {
-      console.log("Done!")
+    const isLastWordTyped =
+      committedWords.length === targetWords.length - 1 &&
+      typedWord === targetWords[targetWords.length - 1];
+    
+    if (isLastWordTyped) {
+      console.log("Done!");
       setGameState("finished");
-      console.log("Game state set to 'finished'")
+      console.log("Game state set to 'finished'");
     }
-  }, [typed])
+
+  }, [committedWords, typedWord]);
 
   return (
     <div id="genesis">
@@ -94,13 +129,18 @@ function App() {
 
             <div id="target">
               {
-                targetArray.map((letter, index) => {
+                targetWords.map((word, index) => {
                   return (
-                    <Letter
+                    <Word
                       key={index}
-                      typed={typed}
-                      position={index}
-                      letter={letter}
+                      word={word + " "}
+                      typedWord={typedWord}
+                      wordStatus={
+                        index < currentWordIndex ? "done"
+                        : index > currentWordIndex ? "untyped"
+                        : "current"
+                      }
+                      currentLetterIndex={currentLetterIndex}
                     />
                   )
                 })
@@ -110,7 +150,7 @@ function App() {
             {
               gameState !== "finished" &&
               <GameInput
-                typed={typed}
+                typedWord={typedWord}
                 onChange={handleInputChange}
                 isDisabled={gameState === "finished"}
               />
@@ -122,12 +162,7 @@ function App() {
 
             {
               gameState === "finished" &&
-              <button
-                onClick={() => {
-                  setGameState("idle");
-                  setFinalWpm("0");
-                }}
-              >
+              <button onClick={handleRestartClick}>
                 Restart Test
               </button>
             }

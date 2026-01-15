@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react"
 
-export function GameInput({ typed, onChange, isDisabled }) {
+export function GameInput({ typedWord, onChange, isDisabled }) {
   const inputRef = useRef(null);
 
   useEffect(() => {
@@ -14,7 +14,7 @@ export function GameInput({ typed, onChange, isDisabled }) {
       type="text"
       disabled={isDisabled}
       onChange={onChange}
-      value={typed}
+      value={typedWord}
     />
   )
 }

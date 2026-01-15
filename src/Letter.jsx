@@ -1,11 +1,11 @@
 
-export function Letter({ typed, position, letter }) {
+export function Letter({ letter, status }) {
   return (
     <p
       className={
-        position < typed.length && letter === typed[position] ? "letter correct"
-        : position < typed.length && letter !== typed[position] ? "letter incorrect"
-        : position === typed.length ? "letter current"
+        status === "correct" ? "letter correct"
+        : status === "incorrect" ? "letter incorrect"
+        : status === "current" ? "letter current"
         : "letter"
       }
     >

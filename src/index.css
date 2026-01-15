@@ -37,6 +37,10 @@ input {
   white-space: pre-wrap;
 }
 
+.word {
+  display: inline-block;
+}
+
 .letter {
   box-sizing: border-box;
   display: inline;
