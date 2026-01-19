@@ -9,11 +9,14 @@ function App() {
   const [ typedWord, setTypedWord ] = useState("");
   const [ timeElapsed, setTimeElapsed ] = useState(0);
   const [ finalWpm, setFinalWpm ] = useState(0);
+  const [ finalAccuracy, setFinalAccuracy ] = useState(0);
 
   const target = "I don't really know yet, so please don't ask me.";
-  const targetWords = target.split(" "); 
+  const targetWords = target.split(" ");
 
   const timerId = useRef(null);
+
+  const mistakesCount = useRef(0);
 
   const currentWordIndex = committedWords.length;
   const currentLetterIndex = typedWord.length;
@@ -36,6 +39,17 @@ function App() {
     }
     else {
       setTypedWord(value);
+
+      if (e.nativeEvent.inputType.startsWith("delete")) {
+        return;
+      }
+
+      const lastTypedIndex = word.length - 1; 
+
+      if (word[word.length - 1] !== targetWords[currentWordIndex][lastTypedIndex]) {
+        mistakesCount.current += 1;
+        console.log("mistake +1");
+      }
     }
 
     if (gameState === "idle" && word.length === 1) {
@@ -48,6 +62,8 @@ function App() {
   const handleRestartClick = () => {
     setFinalWpm(0);
     console.log("Cleared final WPM");
+    setFinalAccuracy(0);
+    console.log("Cleared final accuracy.");
     setGameState("idle");
     console.log("Game state set to 'idle'");
   }
@@ -63,7 +79,36 @@ function App() {
     return wpm;
   }
 
+  const getPrefix = (a, b) => {
+    if (typeof a !== "string" || typeof b !== "string") {
+      return;
+    }
+
+    let startChars = "";
+
+    let i = 0;
+    
+    while (true) {
+      if (a === b) return a;
+
+      if (a[i] === b[i]) {
+        startChars += a[i];
+        i ++;
+      }
+      else {
+        return startChars;
+      }
+    }
+  }
+
   const liveWpm = getTypingSpeed(committedWords, typedWord, timeElapsed);
+  
+  const typedCharsCount = [...committedWords, typedWord].join(" ").length;
+  const correctlyTypedCharsCount = [...committedWords, getPrefix(typedWord, targetWords[currentWordIndex])].join(" ").length;
+
+  const liveAccuracy = 
+    typedCharsCount === 0 ? 100
+    : Math.floor((correctlyTypedCharsCount / (correctlyTypedCharsCount + mistakesCount.current) * 100) * 10) / 10;
 
   useEffect(() => {
     if (gameState !== "running") return;
@@ -90,10 +135,14 @@ function App() {
     console.log("Stopped timer.")
     setFinalWpm(liveWpm);
     console.log("Stored final WPM.");
+    setFinalAccuracy(liveAccuracy);
+    console.log("Stored final accuracy.");
     setCommittedWords([]);
     console.log("Cleared committed words.");
     setTypedWord("");
     console.log("Cleared typed word.");
+    mistakesCount.current = 0;
+    console.log("Cleared mistakes count.");
     setTimeElapsed(0);
     console.log("Cleared time elapsed.");
   }, [gameState]);
@@ -158,6 +207,10 @@ function App() {
             
             <div>
               Speed (WPM): {gameState === "finished" ? finalWpm : liveWpm}
+            </div>
+
+            <div>
+              Live Accuracy: {gameState === "finished" ? finalAccuracy : liveAccuracy}%
             </div>
 
             {
