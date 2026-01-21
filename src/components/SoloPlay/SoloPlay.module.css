@@ -1,0 +1,39 @@
+
+/* Layout CSS */
+
+.mainContainer {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 24px;
+}
+
+.target {
+  white-space: pre-wrap;
+}
+
+.button {
+  padding: 8px 18px;
+}
+
+/* Visual CSS */
+
+.target {
+  font-family: var(--main-font);
+}
+
+.button {
+  cursor: pointer;
+  background-color: black;
+  border: 1px solid white;
+  color: white;
+  font-size: 16px;
+  font-family: var(--main-font);
+  font-weight: bold;
+}
+
+.button:hover {
+  background-color: #555;
+}

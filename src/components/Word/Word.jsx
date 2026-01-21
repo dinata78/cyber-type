@@ -1,10 +1,11 @@
-import { Letter } from "./Letter";
+import styles from "./Word.module.css";
+import { Letter } from "../Letter/Letter";
 
 export function Word({ word, typedWord, wordStatus, currentLetterIndex }) {
   const letters = word.split("");
 
   return (
-    <div className="word">
+    <div className={styles.mainContainer}>
       {
         letters.map((letter, index) => {
           let status = "letter";

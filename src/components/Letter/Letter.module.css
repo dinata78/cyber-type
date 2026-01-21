@@ -1,0 +1,27 @@
+
+/* Layout CSS */
+
+.base {
+  box-sizing: border-box;
+  display: inline;
+}
+
+/* Visual CSS */
+
+.base {
+  opacity: 0.5;
+}
+
+.correct {
+  color: lime;
+  opacity: 1;
+}
+
+.incorrect {
+  color: red;
+  opacity: 1;
+}
+
+.current {
+  box-shadow: -2px 0px 0px 0px limegreen;
+}
