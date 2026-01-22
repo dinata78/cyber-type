@@ -1,0 +1,11 @@
+
+/* Layout CSS */
+
+.mainContainer {
+  flex-grow: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Visual CSS */

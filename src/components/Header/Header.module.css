@@ -1,0 +1,31 @@
+
+/* Layout CSS */
+
+.mainContainer {
+  width: 100vw;
+  height: 72px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 3vw;
+}
+
+.logo {
+  margin-left: 18px;
+}
+
+/* Visual CSS */
+
+.mainContainer {
+  background-color: #444;
+}
+
+.logo {
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.navLink {
+  font-size: 16px;
+  font-weight: bold;
+}

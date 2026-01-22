@@ -1,0 +1,32 @@
+
+/* Layout CSS */
+
+.mainContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.joinGame {
+  width: 200px;
+  height: 100%;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 12px;
+}
+
+/* Visual CSS */
+
+.joinGame {
+  background-color: #333;
+  font-size: 16px;
+  font-weight: bold;
+  border-radius: 12px;
+}
+
+.description {
+  font-size: 12px;
+  font-weight: lighter;
+}

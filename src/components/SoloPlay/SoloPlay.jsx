@@ -97,69 +97,53 @@ export function SoloPlay() {
 
   return (
     <div className={styles.mainContainer}>
-      <h1>Welcome to CyberType!</h1>
+      <h1>Solo Play</h1>
+
+      <div className={styles.target}>
+        {
+          targetWords.map((word, index) => {
+            return (
+              <Word
+                key={index}
+                word={word + " "}
+                typedWord={typedWord}
+                wordStatus={
+                  index < currentWordIndex ? "done"
+                  : index > currentWordIndex ? "untyped"
+                  : "current"
+                }
+                currentLetterIndex={currentLetterIndex}
+              />
+            )
+          })
+        }
+      </div>
 
       {
-        gameState === "lobby" ?
-          <button
-            className={styles.button}
-            onClick={() => {
-              gameIdle();
-              console.log("Game state set to 'idle'")
-            }}
-          >
-            Start Game
-          </button>
-        : <>
+        gameState !== "finished" &&
+        <GameInput
+          typedWord={typedWord}
+          onChange={handleInputChange}
+          isDisabled={gameState === "finished"}
+        />
+      }
+      
+      <div>
+        Speed (WPM): {gameState === "finished" ? finalWpm : liveWpm}
+      </div>
 
-            <div className={styles.target}>
-              {
-                targetWords.map((word, index) => {
-                  return (
-                    <Word
-                      key={index}
-                      word={word + " "}
-                      typedWord={typedWord}
-                      wordStatus={
-                        index < currentWordIndex ? "done"
-                        : index > currentWordIndex ? "untyped"
-                        : "current"
-                      }
-                      currentLetterIndex={currentLetterIndex}
-                    />
-                  )
-                })
-              }
-            </div>
+      <div>
+        Live Accuracy: {gameState === "finished" ? finalAccuracy : liveAccuracy}%
+      </div>
 
-            {
-              gameState !== "finished" &&
-              <GameInput
-                typedWord={typedWord}
-                onChange={handleInputChange}
-                isDisabled={gameState === "finished"}
-              />
-            }
-            
-            <div>
-              Speed (WPM): {gameState === "finished" ? finalWpm : liveWpm}
-            </div>
-
-            <div>
-              Live Accuracy: {gameState === "finished" ? finalAccuracy : liveAccuracy}%
-            </div>
-
-            {
-              gameState === "finished" &&
-              <button
-                className={styles.button}
-                onClick={handleRestartClick}
-              >
-                Restart Test
-              </button>
-            }
-
-          </>
+      {
+        gameState === "finished" &&
+        <button
+          className={styles.button}
+          onClick={handleRestartClick}
+        >
+          Restart Test
+        </button>
       }
     </div>
   )
