@@ -1,0 +1,26 @@
+
+/* Layout CSS */
+
+.input {
+  width: min(240px, 25vw);
+  height: 36px;
+  padding-inline: 8px;
+}
+
+/* Visual CSS */
+
+.input {
+  background-color: #222;
+  border: none;
+  border-radius: 8px;
+  color: white;
+  font-size: 12px;
+}
+
+.input:focus {
+  outline: none;
+}
+
+.input::placeholder {
+  color: #999;
+}

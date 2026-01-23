@@ -1,0 +1,12 @@
+
+/* Layout CSS */
+
+.mainContainer {
+  position: relative;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Visual CSS */

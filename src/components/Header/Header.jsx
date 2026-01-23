@@ -1,32 +1,59 @@
 import styles from "./Header.module.css";
+import { useNavigate } from "react-router-dom";
 import { NavLink } from "../NavLink/NavLink";
+import { UserSearch } from "../UserSearch/UserSearch";
+import { Auth } from "../Auth/Auth";
 
 export function Header() {
+  const navigate = useNavigate();
+
+  const handleSearchSubmit = (e) => {
+    e.preventDefault();
+
+    const form = e.currentTarget;
+    const formData = new FormData(form);
+    const query = formData.get("query").trim();
+
+    if (!query) return;
+
+    navigate(`/search/${query}`);
+    form.reset();
+    document.activeElement.blur();
+  }
+
   return (
     <header className={styles.mainContainer}>
       <NavLink
         to={"/"}
-        children={"CYBERTYPE"}
         className={styles.logo}
-      />
+      >
+        CYBERTYPE
+      </NavLink>
 
       <NavLink
         to={"/"}
-        children={"LOBBY"}
         className={styles.navLink}
-      />
+      >
+        LOBBY
+      </NavLink>
 
       <NavLink
         to={"/forum"}
-        children={"FORUM"}
         className={styles.navLink}
-      />
+      >
+        FORUM
+      </NavLink>
 
       <NavLink
         to={"/leaderboard"}
-        children={"LEADERBOARD"}
         className={styles.navLink}
-      />
+      >
+        LEADERBOARD
+      </NavLink>
+
+      <UserSearch onSubmit={handleSearchSubmit} />
+
+      <Auth />
     </header>
   )
 }
