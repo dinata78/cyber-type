@@ -2,6 +2,7 @@ import styles from "./Auth.module.css";
 import { useEffect, useRef, useState } from "react";
 import { AuthPopover } from "../AuthPopover/AuthPopover";
 import { AuthButton } from "../AuthButton/AuthButton";
+import { useAuth } from "../../custom-hooks/useAuth";
 
 export function Auth() {
   const [ popoverState, setPopoverState ] = useState("closed");
@@ -13,9 +14,7 @@ export function Auth() {
 
   const closePopover = () => setPopoverState("closed");
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-  }
+  const { handleLoginSubmit, handleSignupSubmit } = useAuth();
 
   useEffect(() => {
     if (popoverState === "closed") return;
@@ -51,7 +50,8 @@ export function Auth() {
         popoverState !== "closed" &&
         <AuthPopover
           popoverState={popoverState}
-          handleSubmit={handleSubmit}
+          onLoginSubmit={handleLoginSubmit}
+          onSignupSubmit={handleSignupSubmit}
         />
       }
     </div>

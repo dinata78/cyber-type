@@ -1,11 +1,11 @@
 import styles from "./AuthPopover.module.css";
 import { AuthInput } from "../AuthInput/AuthInput";
 
-export function AuthPopover({ popoverState, handleSubmit }) {
+export function AuthPopover({ popoverState, onLoginSubmit, onSignupSubmit }) {
   return (
     <form
       className={styles.mainContainer}
-      onSubmit={handleSubmit}
+      onSubmit={popoverState === "login" ? onLoginSubmit : onSignupSubmit}
     >
       {
         popoverState === "signup" &&
@@ -29,7 +29,7 @@ export function AuthPopover({ popoverState, handleSubmit }) {
       />
 
       <button className={styles.submitButton} type="submit">
-        {popoverState === "signup" ? "SIGN UP" : "LOG IN"}
+        {popoverState === "login" ? "LOG IN" : "SIGN UP"}
       </button>
     </form>
   )
