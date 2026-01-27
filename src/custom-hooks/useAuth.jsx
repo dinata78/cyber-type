@@ -1,9 +1,24 @@
-import { auth, db, functions } from "../../firebase";
-import { signInWithEmailAndPassword } from "firebase/auth";
+import { useEffect, useState } from "react";
+import { auth, db } from "../../firebase";
+import { onAuthStateChanged, signInWithEmailAndPassword, signOut } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
-import { httpsCallable } from "firebase/functions";
 
 export function useAuth() {
+  const [ isAuthenticated, setIsAuthenticated ] = useState(false);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (userRecord) => {
+      if (userRecord?.uid) {
+        setIsAuthenticated(true);
+      }
+      else {
+        setIsAuthenticated(false);
+      }
+    })
+
+    return unsubscribe;
+  }, []);
+
   const login = async (username, password) => {
     try {
       const usernameKey = username.replaceAll(/\s+/g, " ").trim().toLowerCase();
@@ -44,42 +59,25 @@ export function useAuth() {
     }
   }
 
-  const handleLoginSubmit = async (e) => {
-    e.preventDefault();
+  const logout = async () => {
+    try {
+      await signOut(auth);
+    }
+    catch (error) {
+      return {
+        ok: false,
+        error: error.code,
+      }
+    }
 
-    const form = e.currentTarget;
-    const formData = new FormData(form);
-    const username = formData.get("username");
-    const password = formData.get("password");
-
-    const result = await login(username, password);
-
-    console.log(result);
-  }
-
-  const handleSignupSubmit = async (e) => {
-    e.preventDefault();
-
-    const form = e.currentTarget;
-    const formData = new FormData(form);
-    const email = formData.get("email");
-    const username = formData.get("username");
-    const password = formData.get("password");
-
-    const signup = httpsCallable(functions, "signup");
-
-    const result = await signup({ email, username, password });
-
-    console.log(result.data);
-
-    if (result.data.ok) {
-      await signInWithEmailAndPassword(
-        auth,
-        email,
-        password,
-      )
+    return {
+      ok: true,
     }
   }
 
-  return { handleLoginSubmit, handleSignupSubmit }
+  return {
+    isAuthenticated,
+    login,
+    logout,
+  }
 }

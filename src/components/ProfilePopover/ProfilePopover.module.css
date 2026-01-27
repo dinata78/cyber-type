@@ -1,0 +1,40 @@
+
+/* Layout CSS */
+
+.mainContainer {
+  position: absolute;
+  top: 72px;
+  width: 120%;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.button {
+  height: 32px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Visual CSS */
+
+.mainContainer {
+  background-color: #333;
+  border-bottom-left-radius: 8px;
+  border-bottom-right-radius: 8px;
+}
+
+.button {
+  background-color: transparent;
+  border: 2px solid #111;
+  border-radius: 12px;
+  color: #ddd;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.logout {
+  background-color: #111;
+}

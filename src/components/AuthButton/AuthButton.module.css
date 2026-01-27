@@ -2,8 +2,9 @@
 /* Layout CSS */
 
 .mainContainer {
+  width: 180px;
   display: flex;
-  gap: 2vw;
+  justify-content: space-between;
 }
 
 .button {
