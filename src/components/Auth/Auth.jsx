@@ -6,13 +6,18 @@ import { useAuth } from "../../custom-hooks/useAuth";
 import { auth, functions } from "../../../firebase";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { httpsCallable } from "firebase/functions";
+import { useErrorMessages } from "../../custom-hooks/useErrorMessages";
 
 export function Auth() {
   const [ popoverState, setPopoverState ] = useState("closed");
+  const [ errorMessage, setErrorMessage ] = useState("");
+  const [ isSubmitting, setIsSubmitting ] = useState(false);
 
   const mainContainerRef = useRef(null);
 
   const { login } = useAuth();
+
+  const { getErrorMessage } = useErrorMessages();
 
   const closePopover = () => setPopoverState("closed");
 
@@ -22,22 +27,33 @@ export function Auth() {
   const handleLoginSubmit = async (e) => {
     e.preventDefault();
 
+    if (isSubmitting) return;
+
     const form = e.currentTarget;
     const formData = new FormData(form);
     const username = formData.get("username");
     const password = formData.get("password");
 
+    setIsSubmitting(true);
+
     const result = await login(username, password);
+
+    setIsSubmitting(false);
 
     console.log(result);
 
     if (result.ok) {
       closePopover();
     }
+    else {
+      setErrorMessage(getErrorMessage(result.code));
+    }
   }
 
   const handleSignupSubmit = async (e) => {
     e.preventDefault();
+
+    if (isSubmitting) return;
 
     const form = e.currentTarget;
     const formData = new FormData(form);
@@ -45,9 +61,28 @@ export function Auth() {
     const username = formData.get("username");
     const password = formData.get("password");
 
+    if (!email || !username || !password) {
+      setErrorMessage(getErrorMessage("EMPTY_FIELDS"));
+      return;
+    }
+
+    if (username.length > 16) {
+      setErrorMessage(getErrorMessage("INVALID_USERNAME_LENGTH"));
+      return;
+    }
+
+    if (password.length < 8 || password.length > 64) {
+      setErrorMessage(getErrorMessage("INVALID_PASSWORD_LENGTH"));
+      return;
+    }
+
     const signup = httpsCallable(functions, "signup");
 
+    setIsSubmitting(true);
+
     const result = await signup({ email, username, password });
+
+    setIsSubmitting(false);
 
     console.log(result.data);
 
@@ -58,6 +93,9 @@ export function Auth() {
         password,
       )
       closePopover();
+    }
+    else {
+      setErrorMessage(getErrorMessage(result.data.code));
     }
   }
 
@@ -80,6 +118,10 @@ export function Auth() {
     }
   }, [popoverState]);
 
+  useEffect(() => {
+    setErrorMessage("");
+  }, [popoverState]);
+
   return (
     <div
       ref={mainContainerRef}
@@ -97,6 +139,8 @@ export function Auth() {
           popoverState={popoverState}
           onLoginSubmit={handleLoginSubmit}
           onSignupSubmit={handleSignupSubmit}
+          errorMessage={errorMessage}
+          isSubmitting={isSubmitting}
         />
       }
     </div>

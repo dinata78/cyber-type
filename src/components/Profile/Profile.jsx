@@ -1,15 +1,18 @@
 import styles from "./Profile.module.css";
-import { auth } from "../../../firebase";
 import { useEffect, useRef, useState } from "react";
 import { ProfilePopover } from "../ProfilePopover/ProfilePopover";
 import { useAuth } from "../../custom-hooks/useAuth";
+import { useNavigate } from "react-router-dom";
 
 export function Profile() {
   const [ isPopoverVisible, setIsPopoverVisible ] = useState(false);
+  const [ isLoggingOut, setIsLoggingOut ] = useState(false);
+
+  const navigate = useNavigate();
 
   const mainContainerRef = useRef(null);
 
-  const { logout } = useAuth();
+  const { userRecord, logout } = useAuth();
 
   const closePopover = () => setIsPopoverVisible(false);
 
@@ -17,13 +20,24 @@ export function Profile() {
     setIsPopoverVisible(prev => !prev);
   }
 
-  const handleLogOut = async () => {
-    console.log(1)
+  const handleProfileClick = () => {
+    closePopover();
+    navigate(`/user/${userRecord.displayName}`)
+  }
+
+  const handleLogOutClick = async () => {
+    if (isLoggingOut) return;
+
+    setIsLoggingOut(true);
+
     const result = await logout();
-    console.log(2)
+
+    setIsLoggingOut(false);
 
     console.log(result);
-  } 
+
+    if (result.ok) closePopover();
+  }
 
   useEffect(() => {
     if (!isPopoverVisible) return;
@@ -36,11 +50,11 @@ export function Profile() {
     }
 
     document.addEventListener("mousedown", handleOutsideClick);
-    console.log("Profile's handleOutsideClick event attached");
+    console.log("Profile handleOutsideClick event attached");
 
     return () => {
       document.removeEventListener("mousedown", handleOutsideClick);
-      console.log("Profile's handleOutsideClick event removed");
+      console.log("Profile handleOutsideClick event removed");
     }
   
 
@@ -52,13 +66,17 @@ export function Profile() {
         className={styles.button}
         onClick={handleClick}
       >
-        {auth.currentUser?.displayName}
+        {userRecord?.displayName || "Loading..."}
         <span>Matches Played: 0</span>
       </button>
 
       {
         isPopoverVisible &&
-        <ProfilePopover handleLogOut={handleLogOut} />
+        <ProfilePopover
+          handleProfileClick={handleProfileClick}
+          handleLogOutClick={handleLogOutClick}
+          isLoggingOut={isLoggingOut}
+        />
       }
     </div>
   )

@@ -1,15 +1,14 @@
 import styles from "./ProfilePopover.module.css";
-import { NavLink } from "../NavLink/NavLink";
 
-export function ProfilePopover({ handleLogOut }) {
+export function ProfilePopover({ handleProfileClick, handleLogOutClick, isLoggingOut }) {
   return (
     <div className={styles.mainContainer}>
-      <NavLink
-        to={`/user/myUsername`}
+      <button
         className={styles.button}
+        onClick={handleProfileClick}
       >
         PROFILE
-      </NavLink>
+      </button>
 
       <button
         className={styles.button}
@@ -18,8 +17,11 @@ export function ProfilePopover({ handleLogOut }) {
       </button>
 
       <button
-        className={`${styles.button} ${styles.logout} `}
-        onClick={handleLogOut}
+        className={
+          `${styles.button} ${styles.logout} ${isLoggingOut ? styles.loggingOut : ""}`
+        }
+        onClick={handleLogOutClick}
+        disabled={isLoggingOut}
       >
         LOG OUT
       </button>

@@ -18,7 +18,16 @@ exports.signup = onCall(async (request) => {
   if (!email || !username || !password) {
     return {
       ok: false,
-      error: "invalid-argument",
+      code: "EMPTY_FIELDS",
+    }
+  }
+
+  const isValidUsername = /^[A-Za-z0-9 ]+$/.test(username);
+
+  if (!isValidUsername) {
+    return {
+      ok: false,
+      code: "INVALID_USERNAME_FORMAT",
     }
   }
 
@@ -28,14 +37,14 @@ exports.signup = onCall(async (request) => {
   if (normalizedUsername.length > 16) {
     return {
       ok: false,
-      error: "invalid-username",
+      code: "INVALID_USERNAME_LENGTH",
     }
   }
 
-  if (password.length < 8 || password.length > 24) {
+  if (password.length < 8 || password.length > 64) {
     return {
       ok: false,
-      error: "invalid-password",
+      code: "INVALID_PASSWORD_LENGTH",
     }
 
   }
@@ -51,7 +60,7 @@ exports.signup = onCall(async (request) => {
   if (doc.exists) {
     return {
       ok: false,
-      error: "auth/username-already-exists",
+      code: "USERNAME_ALREADY_EXISTS",
     }
   }
 
@@ -66,9 +75,15 @@ exports.signup = onCall(async (request) => {
     });
   }
   catch (error) {
+    if (error.code === "auth/email-already-exists") {
+      return {
+        ok: false,
+        code: "EMAIL_ALREADY_EXISTS",
+      }
+    }
     return {
       ok: false,
-      error: error.code,
+      code: "INTERNAL_SERVER_ERROR",
     }
   }
 
@@ -102,7 +117,7 @@ exports.signup = onCall(async (request) => {
 
     return {
       ok: false,
-      error: "firestore-write-fails",
+      code: "INTERNAL_SERVER_ERROR",
     }
   }
   

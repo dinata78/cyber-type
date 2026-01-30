@@ -4,22 +4,38 @@ import { onAuthStateChanged, signInWithEmailAndPassword, signOut } from "firebas
 import { doc, getDoc } from "firebase/firestore";
 
 export function useAuth() {
-  const [ isAuthenticated, setIsAuthenticated ] = useState(false);
+  const [ userRecord, setUserRecord ] = useState(null);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (userRecord) => {
-      if (userRecord?.uid) {
-        setIsAuthenticated(true);
-      }
-      else {
-        setIsAuthenticated(false);
-      }
+      setUserRecord(userRecord);
     })
 
     return unsubscribe;
   }, []);
 
   const login = async (username, password) => {
+    if (!username || !password) {
+      return {
+        ok: false,
+        code: "EMPTY_FIELDS",
+      }
+    }
+
+    if (username.length > 16) {
+      return {
+        ok: false,
+        code: "INVALID_USERNAME_LENGTH",
+      }
+    }
+
+    if (password.length < 8 || password.length > 64) {
+      return {
+        ok: false,
+        code: "INVALID_PASSWORD_LENGTH",
+      }
+    }
+
     try {
       const usernameKey = username.replaceAll(/\s+/g, " ").trim().toLowerCase();
       const usernamesDoc = await getDoc(doc(db, "usernames", usernameKey));
@@ -27,7 +43,7 @@ export function useAuth() {
       if (!usernamesDoc.exists()) {
         return {
           ok: false,
-          error: "auth/username-not-found",
+          code: "USERNAME_NOT_FOUND",
         }
       }
 
@@ -37,7 +53,7 @@ export function useAuth() {
       if (!usersDoc.exists()) {
         return {
           ok: false,
-          error: "user-data-not-found",
+          code: "INTERNAL_SERVER_ERROR",
         }
       }
       else {
@@ -52,9 +68,28 @@ export function useAuth() {
       }
     }
     catch (error) {
+      if (error.code === "auth/wrong-password") {
+        return {
+          ok: false,
+          code: "WRONG_PASSWORD",
+        }
+      }
+      else if (error.code === "auth/user-disabled") {
+        return {
+          ok: false,
+          code: "USER_DISABLED",
+        }
+      }
+      else if (error.code === "invalid-argument") {
+        return {
+          ok: false,
+          code: "EMPTY_FIELDS",
+        }
+      }
+
       return {
         ok: false,
-        error: error.code,
+        code: "INTERNAL_SERVER_ERROR",
       }
     }
   }
@@ -66,7 +101,7 @@ export function useAuth() {
     catch (error) {
       return {
         ok: false,
-        error: error.code,
+        code: "INTERNAL_SERVER_ERROR",
       }
     }
 
@@ -76,7 +111,8 @@ export function useAuth() {
   }
 
   return {
-    isAuthenticated,
+    isAuthenticated: !!userRecord,
+    userRecord,
     login,
     logout,
   }

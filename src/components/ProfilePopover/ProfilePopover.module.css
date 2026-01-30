@@ -13,9 +13,6 @@
 
 .button {
   height: 32px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
 }
 
 /* Visual CSS */
@@ -36,5 +33,12 @@
 }
 
 .logout {
-  background-color: #111;
+  border: none;
+  background-color: #000;
+}
+
+.loggingOut {
+  cursor: auto;
+  background-color: #555;
+  color: #aaa;
 }
