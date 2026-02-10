@@ -1,0 +1,59 @@
+
+/* Layout CSS */
+
+.mainContainer {
+  width: 480px;
+  min-height: 360px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.header {
+  min-height: 32px;
+  padding: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+.wordsContainer {
+  flex-grow: 1;
+  padding: 12px;
+  white-space: pre-wrap;
+}
+
+/* Visual CSS */
+
+.mainContainer {
+  background-color: #222;
+  border-radius: 12px;
+  font-family: var(--main-font);
+}
+
+.header {
+  border: 1px solid #a178fa;
+  color: #cfe4ff;
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.easy {
+  color: lime;
+}
+
+.medium {
+  color: yellow;
+}
+
+.hard {
+  color: red;
+}
+
+.wordsContainer {
+  background-color: #444;
+  border: 1px solid #a178fa;
+  line-height: 1.5;
+}

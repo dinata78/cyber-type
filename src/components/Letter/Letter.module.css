@@ -9,19 +9,18 @@
 /* Visual CSS */
 
 .base {
-  opacity: 0.5;
+  user-select: none;
+  font-size: 15px;
 }
 
 .correct {
   color: lime;
-  opacity: 1;
 }
 
 .incorrect {
   color: red;
-  opacity: 1;
 }
 
 .current {
-  box-shadow: -2px 0px 0px 0px limegreen;
+  box-shadow: -2px 0px 0px 0px #a178fa;
 }

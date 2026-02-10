@@ -1,7 +1,6 @@
 import styles from "./SoloPlay.module.css";
 import { useEffect } from "react";
 import { GameInput } from "../GameInput/GameInput";
-import { Word } from "../Word/Word";
 import { useGameState } from "../../custom-hooks/useGameState";
 import { useQuote } from "../../custom-hooks/useQuote";
 import { useTimer } from "../../custom-hooks/useTimer";
@@ -9,11 +8,14 @@ import { useMistakes } from "../../custom-hooks/useMistakes";
 import { useTypingLogic } from "../../custom-hooks/useTypingLogic";
 import { useLiveData } from "../../custom-hooks/useLiveData";
 import { useFinalData } from "../../custom-hooks/useFinalData";
+import { Quote } from "../Quote/Quote";
 
 export function SoloPlay() {
   const { gameState, gameIdle, gameRunning, gameFinished } = useGameState();
 
-  const { targetWords } = useQuote();
+  const { text, origin, difficulty, pickNewQuote } = useQuote();
+
+  const targetWords = text.split(" ");
 
   const { timeElapsed, resetTimer, stopTimer } = useTimer(gameState);
 
@@ -59,6 +61,8 @@ export function SoloPlay() {
     console.log("Cleared final WPM");
     clearFinalAccuracy();
     console.log("Cleared final accuracy.");
+    pickNewQuote();
+    console.log("Picked new quote.");
     gameIdle();
     console.log("Game state set to 'idle'");
   }
@@ -97,43 +101,25 @@ export function SoloPlay() {
 
   return (
     <div className={styles.mainContainer}>
-      <h1>Solo Play</h1>
-
-      <div className={styles.target}>
-        {
-          targetWords.map((word, index) => {
-            return (
-              <Word
-                key={index}
-                word={word + " "}
-                typedWord={typedWord}
-                wordStatus={
-                  index < currentWordIndex ? "done"
-                  : index > currentWordIndex ? "untyped"
-                  : "current"
-                }
-                currentLetterIndex={currentLetterIndex}
-              />
-            )
-          })
-        }
-      </div>
-
-      {
-        gameState !== "finished" &&
-        <GameInput
+      <div className={styles.middle}>
+        <Quote
+          targetWords={targetWords}
+          currentWordIndex={currentWordIndex}
+          currentLetterIndex={currentLetterIndex}
           typedWord={typedWord}
-          onChange={handleInputChange}
-          isDisabled={gameState === "finished"}
+          origin={origin}
+          difficulty={difficulty}
         />
-      }
-      
-      <div>
-        Speed (WPM): {gameState === "finished" ? finalWpm : liveWpm}
-      </div>
 
-      <div>
-        Live Accuracy: {gameState === "finished" ? finalAccuracy : liveAccuracy}%
+        {
+          gameState !== "finished" &&
+          <GameInput
+            typedWord={typedWord}
+            onChange={handleInputChange}
+            isDisabled={gameState === "finished"}
+            pickNewQuote={pickNewQuote}
+          />
+        }
       </div>
 
       {

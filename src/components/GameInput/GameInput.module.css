@@ -1,17 +1,43 @@
 
 /* Layout CSS */
 
-.gameInput {
-  width: 360px;
-  height: 32px;
+.mainContainer {
+  height: 120px;
+  padding: 16px;
+}
+
+.border {
+  height: 100%;
+  padding: 24px 48px;
+}
+
+.input {
+  width: 100%;
+  height: 100%;
   padding: 4px 12px;
 }
 
 /* Visual CSS */
 
-.gameInput {
+.mainContainer {
+  background-color: #222;
+  border-radius: 12px;
+}
+
+.border {
+  border: 1px solid #a178fa;
+}
+
+.input {
   background-color: transparent;
-  border: 1px solid white;
+  border: none;
+  border-bottom: 1px solid #aaa;
   color: white;
-  font-size: 12px;
+  font-size: 16px;
+  text-align: center;
+}
+
+.input:focus {
+  outline: none;
+  border-bottom-color: white;
 }

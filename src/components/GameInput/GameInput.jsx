@@ -10,13 +10,17 @@ export function GameInput({ typedWord, onChange, isDisabled }) {
   }, []);
 
   return (
-    <input
-      className={styles.gameInput}
-      ref={inputRef}
-      type="text"
-      disabled={isDisabled}
-      onChange={onChange}
-      value={typedWord}
-    />
+    <div className={styles.mainContainer}>
+      <div className={styles.border}>
+        <input
+          className={styles.input}
+          ref={inputRef}
+          type="text"
+          disabled={isDisabled}
+          onChange={onChange}
+          value={typedWord}
+        />
+      </div>
+    </div>
   )
 }

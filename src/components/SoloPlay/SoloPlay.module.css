@@ -11,8 +11,10 @@
   gap: 24px;
 }
 
-.target {
-  white-space: pre-wrap;
+.middle {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
 }
 
 .button {
@@ -20,10 +22,6 @@
 }
 
 /* Visual CSS */
-
-.target {
-  font-family: var(--main-font);
-}
 
 .button {
   background-color: transparent;
