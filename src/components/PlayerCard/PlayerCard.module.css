@@ -1,0 +1,101 @@
+
+/* Layout CSS */
+
+.mainContainer {
+  flex-grow: 1;
+  width: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.data {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.metrics {
+  width: 100%;
+  height: 24px;
+  display: flex;
+  font-size: 10px;
+  gap: 2px;
+}
+
+.metricPart {
+  width: 50%;
+  padding-left: 8px;
+  display: flex;
+  align-items: center;
+}
+
+.player {
+  flex-grow: 1;
+  display: flex;
+  align-items: center;
+
+}
+
+.pfp {
+  width: 32px;
+  height: 32px;
+  margin-inline: 8px;
+}
+
+.speed {
+  min-width: 54px;
+  height: 100%;
+  margin-left: auto;
+  padding-inline: 6px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Visual CSS */
+
+.mainContainer {
+  border: 1px solid #ff0000bb;
+  font-size: 12px;
+  color: #ff0000bb;
+}
+
+.metrics {
+  border-bottom: 1px solid #ff0000bb;
+}
+
+.metricPart {
+  background-color: #ff000022;
+}
+
+.pfp {
+  border: 1px solid #ff0000bb;
+}
+
+.speed {
+  border-left: 1px solid #ff0000bb;
+  text-align: center;
+}
+
+.basic {
+  border-color: var(--color-two);
+  color: var(--color-two);
+}
+
+.basic .metrics {
+  border-bottom-color: var(--color-two);
+}
+
+.basic .metricPart {
+  background-color: #aaddff22;
+}
+
+.basic .pfp {
+  border-color: var(--color-two);
+}
+
+.basic .speed {
+  border-left-color: var(--color-two);
+}

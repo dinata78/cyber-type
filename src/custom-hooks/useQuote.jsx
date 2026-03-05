@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 const quotes = [
   {
@@ -29,7 +29,7 @@ export function useQuote() {
     const randomIndex = Math.floor(Math.random() * quotes.length);
 
     setQuote(quotes[randomIndex]);
-  }
+  };
 
   return {
     text: quote.text,

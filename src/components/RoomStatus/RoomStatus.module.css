@@ -1,0 +1,46 @@
+
+/* Layout CSS */
+
+.mainContainer {
+  width: 100%;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 12px;
+}
+
+.button {
+  height: 36px;
+}
+
+.div {
+  height: 36px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Visual CSS */
+
+.mainContainer {
+  border: 1px solid var(--color-one);
+}
+
+.button {
+  background-color: transparent;
+  border: 1px solid var(--color-two);
+  color: var(--color-two);
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.button:hover {
+  background-color: #335;
+}
+
+.div {
+  border: 1px solid var(--color-one);
+  color: lime;
+  font-size: 12px;
+}

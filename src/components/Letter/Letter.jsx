@@ -1,6 +1,7 @@
 import styles from "./Letter.module.css";
+import { memo } from "react";
 
-export function Letter({ letter, status }) {
+export default memo(function Letter({ letter, status }) {
   return (
     <p
       className={
@@ -13,4 +14,4 @@ export function Letter({ letter, status }) {
       {letter}
     </p>
   )
-}
+});

@@ -1,0 +1,12 @@
+
+/* Layout CSS */
+
+.mainContainer {
+  height: 100%;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Visual CSS */

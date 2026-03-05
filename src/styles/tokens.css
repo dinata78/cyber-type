@@ -1,4 +1,7 @@
 
 :root {
-  --main-font: "monospace";
+  --main-font-family: "monospace";
+  --color-one: #a178fa;
+  --color-two: #cfe4ff;
+  --color-three: #d4d104;
 }

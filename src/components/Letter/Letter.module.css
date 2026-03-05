@@ -22,5 +22,5 @@
 }
 
 .current {
-  box-shadow: -2px 0px 0px 0px #a178fa;
+  box-shadow: -2px 0px 0px 0px var(--color-one);
 }

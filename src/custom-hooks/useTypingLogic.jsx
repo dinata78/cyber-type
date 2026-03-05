@@ -1,11 +1,13 @@
 import { useState } from "react";
 
-export function useTypingLogic(gameState, gameRunning, targetWords, incrementMistakes) {
+export function useTypingLogic(gameState, targetWords, incrementMistakes) {
   const [ committedWords, setCommittedWords ] = useState([]);
   const [ typedWord, setTypedWord ] = useState("");
 
-  const clearCommitedWords = () => setCommittedWords([]);
-  const clearTypedWord = () => setTypedWord("");
+  const clearWords = () => {
+    setCommittedWords([]);
+    setTypedWord("");
+  }
 
   const currentWordIndex = committedWords.length;
   const currentLetterIndex = typedWord.length;
@@ -18,7 +20,6 @@ export function useTypingLogic(gameState, gameRunning, targetWords, incrementMis
       gameState === "finished" ||
       word.length > targetWords[currentWordIndex].length
     ) return;
-
 
     if (value.endsWith(" ")) {
       if (word === targetWords[currentWordIndex]) {
@@ -40,21 +41,14 @@ export function useTypingLogic(gameState, gameRunning, targetWords, incrementMis
         console.log("mistake +1");
       }
     }
-
-    if (gameState === "idle" && word.length === 1) {
-      console.log("First letter typed.");
-      gameRunning();
-      console.log("Game state set to 'running'");
-    }
   }
 
   return {
     committedWords,
     typedWord,
-    clearCommitedWords,
-    clearTypedWord,
+    clearWords,
     currentWordIndex,
     currentLetterIndex,
     handleInputChange,
   };
-}
+} 

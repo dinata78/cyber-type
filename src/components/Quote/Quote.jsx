@@ -1,5 +1,5 @@
 import styles from "./Quote.module.css";
-import { Word } from "../Word/Word";
+import Word from "../Word/Word";
 
 export function Quote({ targetWords, currentWordIndex, currentLetterIndex, typedWord, origin, difficulty }) {
   return (
@@ -19,13 +19,13 @@ export function Quote({ targetWords, currentWordIndex, currentLetterIndex, typed
               <Word
                 key={index}
                 word={word + " "}
-                typedWord={typedWord}
+                typedWord={index === currentWordIndex ? typedWord : null}
                 wordStatus={
-                  index < currentWordIndex ? "done"
-                  : index > currentWordIndex ? "untyped"
+                  index < currentWordIndex ? "past"
+                  : index > currentWordIndex ? "future"
                   : "current"
                 }
-                currentLetterIndex={currentLetterIndex}
+                currentLetterIndex={index === currentWordIndex ? currentLetterIndex : null}
               />
             )
           })

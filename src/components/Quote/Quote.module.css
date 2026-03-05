@@ -2,16 +2,13 @@
 /* Layout CSS */
 
 .mainContainer {
-  width: 480px;
-  min-height: 360px;
-  padding: 16px;
+  flex-grow: 1;
   display: flex;
   flex-direction: column;
   gap: 16px;
 }
 
 .header {
-  min-height: 32px;
   padding: 8px;
   display: flex;
   justify-content: space-between;
@@ -28,14 +25,12 @@
 /* Visual CSS */
 
 .mainContainer {
-  background-color: #222;
-  border-radius: 12px;
-  font-family: var(--main-font);
+  font-family: var(--main-font-family);
 }
 
 .header {
-  border: 1px solid #a178fa;
-  color: #cfe4ff;
+  border: 1px solid var(--color-one);
+  color: var(--color-two);
   font-size: 16px;
   line-height: 1.5;
 }
@@ -54,6 +49,6 @@
 
 .wordsContainer {
   background-color: #444;
-  border: 1px solid #a178fa;
+  border: 1px solid var(--color-one);
   line-height: 1.5;
 }

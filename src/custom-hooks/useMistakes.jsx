@@ -1,16 +1,18 @@
-import { useRef } from "react";
+import { useState } from "react";
 
 export function useMistakes() {
-  const mistakesCount = useRef(0);
+  const [ mistakes, setMistakes ] = useState(0);
+
   const incrementMistakes = () => {
-    mistakesCount.current += 1;
+    setMistakes(prev => prev + 1);
   }
+
   const resetMistakes = () => {
-    mistakesCount.current = 0;
+    setMistakes(0);
   }
 
   return {
-    getMistakes: () => mistakesCount.current,
+    mistakes,
     incrementMistakes,
     resetMistakes,
   };

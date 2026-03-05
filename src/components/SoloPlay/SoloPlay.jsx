@@ -1,90 +1,67 @@
 import styles from "./SoloPlay.module.css";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { GameInput } from "../GameInput/GameInput";
 import { useGameState } from "../../custom-hooks/useGameState";
 import { useQuote } from "../../custom-hooks/useQuote";
-import { useTimer } from "../../custom-hooks/useTimer";
 import { useMistakes } from "../../custom-hooks/useMistakes";
 import { useTypingLogic } from "../../custom-hooks/useTypingLogic";
-import { useLiveData } from "../../custom-hooks/useLiveData";
-import { useFinalData } from "../../custom-hooks/useFinalData";
 import { Quote } from "../Quote/Quote";
+import { RoomData } from "../RoomData/RoomData";
 
 export function SoloPlay() {
-  const { gameState, gameIdle, gameRunning, gameFinished } = useGameState();
+  const { gameState, setGameIdle, setGameRunning, setGameFinished } = useGameState();
 
   const { text, origin, difficulty, pickNewQuote } = useQuote();
 
   const targetWords = text.split(" ");
 
-  const { timeElapsed, resetTimer, stopTimer } = useTimer(gameState);
-
-  const { getMistakes, incrementMistakes, resetMistakes } = useMistakes();
+  const { mistakes, incrementMistakes, resetMistakes } = useMistakes();
 
   const {
     committedWords,
     typedWord,
-    clearCommitedWords,
-    clearTypedWord,
+    clearWords,
     currentWordIndex,
     currentLetterIndex,
     handleInputChange,
   } =
     useTypingLogic(
       gameState,
-      gameRunning,
       targetWords,
       incrementMistakes,
     );
 
-  const { liveWpm, liveAccuracy } =
-    useLiveData(
-      targetWords,
-      committedWords,
-      typedWord,
-      currentWordIndex,
-      getMistakes(),
-      timeElapsed,
-    );
+  const roomDataRef = useRef(null);
+  const gameInputRef = useRef(null);
 
-  const {
-    finalWpm,
-    finalAccuracy,
-    setFinalWpm,
-    setFinalAccuracy,
-    clearFinalWpm,
-    clearFinalAccuracy,
-  } = useFinalData();
+  const focusGameInput = () => {
+    gameInputRef.current?.focus();
+  }
 
-  const handleRestartClick = () => {
-    clearFinalWpm();
-    console.log("Cleared final WPM");
-    clearFinalAccuracy();
-    console.log("Cleared final accuracy.");
-    pickNewQuote();
-    console.log("Picked new quote.");
-    gameIdle();
-    console.log("Game state set to 'idle'");
+  const getIsTypedCorrect = () => {
+    const typedLength = typedWord.length;
+    const correctWord = targetWords[currentWordIndex];
+
+    for (let i = 0; i < typedLength; i++) {
+      if (typedWord[i] !== correctWord[i]) {
+        return false;
+      }
+    }
+    return true;
   }
 
   useEffect(() => {
-    if (gameState !== "finished") return;
+    const onKeyDown = (e) => {
+      if (e.ctrlKey && e.key === "Enter") {
+        console.log("Ctrl + Enter detected.");
+        roomDataRef.current?.handleNewGame();
+      }
+    }
 
-    stopTimer();
-    console.log("Stopped timer.")
-    setFinalWpm(liveWpm);
-    console.log("Stored final WPM.");
-    setFinalAccuracy(liveAccuracy);
-    console.log("Stored final accuracy.");
-    clearCommitedWords();
-    console.log("Cleared committed words.");
-    clearTypedWord();
-    console.log("Cleared typed word.");
-    resetMistakes();
-    console.log("Cleared mistakes count.");
-    resetTimer();
-    console.log("Cleared time elapsed.");
-  }, [gameState]);
+    document.addEventListener("keydown", onKeyDown);
+
+    return () => document.removeEventListener("keydown", onKeyDown);
+  }, []);
 
   useEffect(() => {
     const isLastWordTyped =
@@ -93,7 +70,7 @@ export function SoloPlay() {
     
     if (isLastWordTyped) {
       console.log("Done!");
-      gameFinished();
+      setGameFinished();
       console.log("Game state set to 'finished'");
     }
 
@@ -101,36 +78,50 @@ export function SoloPlay() {
 
   return (
     <div className={styles.mainContainer}>
-      <div className={styles.middle}>
-        <Quote
-          targetWords={targetWords}
-          currentWordIndex={currentWordIndex}
-          currentLetterIndex={currentLetterIndex}
-          typedWord={typedWord}
-          origin={origin}
-          difficulty={difficulty}
-        />
-
-        {
-          gameState !== "finished" &&
-          <GameInput
+      <div className={styles.wrapper}>
+        <div className={styles.left}>
+          <RoomData
+            ref={roomDataRef}
+            gameState={gameState}
+            targetWords={targetWords}
+            committedWords={committedWords}
             typedWord={typedWord}
-            onChange={handleInputChange}
-            isDisabled={gameState === "finished"}
+            currentWordIndex={currentWordIndex}
+            mistakes={mistakes}
+            clearWords={clearWords}
+            resetMistakes={resetMistakes}
+            setGameIdle={setGameIdle}
+            setGameRunning={setGameRunning}
+            focusGameInput={focusGameInput}
             pickNewQuote={pickNewQuote}
           />
-        }
-      </div>
+        </div>
 
-      {
-        gameState === "finished" &&
-        <button
-          className={styles.button}
-          onClick={handleRestartClick}
-        >
-          Restart Test
-        </button>
-      }
+        <div className={styles.middle}>
+          <Quote
+            targetWords={targetWords}
+            currentWordIndex={currentWordIndex}
+            currentLetterIndex={currentLetterIndex}
+            typedWord={typedWord}
+            origin={origin}
+            difficulty={difficulty}
+          />
+
+          <GameInput
+            gameState={gameState}
+            setGameRunning={setGameRunning}
+            gameInputRef={gameInputRef}
+            focusGameInput={focusGameInput}
+            typedWord={typedWord}
+            isTypedCorrect={getIsTypedCorrect()}
+            onChange={handleInputChange}
+          />
+        </div>
+
+        <div className={styles.right}>
+
+        </div>
+      </div>      
     </div>
   )
 }

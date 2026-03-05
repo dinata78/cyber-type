@@ -1,4 +1,5 @@
 import "../../styles/index.css"
+import "../../styles/tokens.css"
 import styles from "./App.module.css"
 import { Route, Routes } from "react-router-dom"
 import { Header } from "../Header/Header"

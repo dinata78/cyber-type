@@ -1,16 +1,17 @@
 import styles from "./Word.module.css";
-import { Letter } from "../Letter/Letter";
+import { memo } from "react";
+import Letter from "../Letter/Letter";
 
-export function Word({ word, typedWord, wordStatus, currentLetterIndex }) {
+export default memo(function Word({ word, typedWord, wordStatus, currentLetterIndex }) {
   const letters = word.split("");
 
   return (
     <div className={styles.mainContainer}>
       {
         letters.map((letter, index) => {
-          let status = "letter";
+          let status = "";
 
-          if (wordStatus === "done") {
+          if (wordStatus === "past") {
             status = "correct"
           }
           else if (wordStatus === "current") {
@@ -33,4 +34,4 @@ export function Word({ word, typedWord, wordStatus, currentLetterIndex }) {
       }
     </div>
   );
-}
+});
