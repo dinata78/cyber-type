@@ -9,7 +9,9 @@
 }
 
 .header {
-  padding: 8px;
+  min-height: 36px;
+  padding-block: 4px;
+  padding-inline: 8px;
   display: flex;
   justify-content: space-between;
   align-items: center;

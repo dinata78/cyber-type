@@ -34,7 +34,7 @@
 .right {
   min-width: 320px;
   max-width: 320px;
-  min-height: 540px;
+  height: 540px;
 }
 
 /* Visual CSS */

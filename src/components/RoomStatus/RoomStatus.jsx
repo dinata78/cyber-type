@@ -19,7 +19,12 @@ export default memo(function RoomStatus({ gameState, handleNewGame, handleStartG
         >
           START GAME
         </button>
-        : <div className={styles.div}>Game is running!</div>
+        : <div className={styles.status}>
+            {
+              gameState === "running" ? "MATCH STARTED..."
+              : "MATCH ENDED!"
+            }
+          </div>
       }
     </div>
   )

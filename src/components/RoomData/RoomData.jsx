@@ -65,6 +65,8 @@ export const RoomData = forwardRef(({ gameState, targetWords, committedWords, ty
 
     stopTimer();
     console.log("Stopped timer.");
+    resetStartTime();
+    console.log("Reset start time.");
     storeFinalData(finalWpm, finalAccuracy, mistakes);
     console.log("Stored final datas.");
     clearWords();

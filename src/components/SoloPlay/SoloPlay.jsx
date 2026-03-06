@@ -7,6 +7,7 @@ import { useMistakes } from "../../custom-hooks/useMistakes";
 import { useTypingLogic } from "../../custom-hooks/useTypingLogic";
 import { Quote } from "../Quote/Quote";
 import { RoomData } from "../RoomData/RoomData";
+import { QuoteLeaderboard } from "../QuoteLeaderboard/QuoteLeadeboard";
 
 export function SoloPlay() {
   const { gameState, setGameIdle, setGameRunning, setGameFinished } = useGameState();
@@ -119,7 +120,7 @@ export function SoloPlay() {
         </div>
 
         <div className={styles.right}>
-
+          <QuoteLeaderboard />
         </div>
       </div>      
     </div>

@@ -14,7 +14,7 @@
   height: 36px;
 }
 
-.div {
+.status {
   height: 36px;
   display: flex;
   justify-content: center;
@@ -39,8 +39,9 @@
   background-color: #335;
 }
 
-.div {
-  border: 1px solid var(--color-one);
+.status {
+  border: 1px solid var(--color-two);
   color: lime;
   font-size: 12px;
+  font-weight: bold;
 }
