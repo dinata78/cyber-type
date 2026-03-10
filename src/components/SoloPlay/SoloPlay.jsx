@@ -12,9 +12,9 @@ import { QuoteLeaderboard } from "../QuoteLeaderboard/QuoteLeadeboard";
 export function SoloPlay() {
   const { gameState, setGameIdle, setGameRunning, setGameFinished } = useGameState();
 
-  const { text, origin, difficulty, pickNewQuote } = useQuote();
+  const { quote, isQuoteLoading, pickNewQuote } = useQuote();
 
-  const targetWords = text.split(" ");
+  const targetWords = !isQuoteLoading ? quote.text.split(" ") : [];
 
   const { mistakes, incrementMistakes, resetMistakes } = useMistakes();
 
@@ -100,12 +100,13 @@ export function SoloPlay() {
 
         <div className={styles.middle}>
           <Quote
+            isQuoteLoading={isQuoteLoading}
             targetWords={targetWords}
             currentWordIndex={currentWordIndex}
             currentLetterIndex={currentLetterIndex}
             typedWord={typedWord}
-            origin={origin}
-            difficulty={difficulty}
+            origin={!isQuoteLoading ? quote.origin : null}
+            difficulty={!isQuoteLoading ? quote.difficulty : null}
           />
 
           <GameInput

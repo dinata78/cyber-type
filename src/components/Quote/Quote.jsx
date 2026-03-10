@@ -7,7 +7,7 @@ export function Quote({ targetWords, currentWordIndex, currentLetterIndex, typed
       <div className={styles.header}>
         <span>{origin}</span>
         <span
-          className={`${styles[difficulty.toLowerCase()]}`}
+          className={`${styles[difficulty?.toLowerCase()]}`}
         >
           [{difficulty}]
         </span>
