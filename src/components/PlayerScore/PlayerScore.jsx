@@ -1,8 +1,14 @@
+import { memo } from "react";
 import styles from "./PlayerScore.module.css";
 
 const getTimePassed = (date) => {
-  const currentDate = new Date();
-  const timeDifference = currentDate - date;
+  let timeDifference = 0;
+  
+  if (date) {
+    const currentDate = new Date();
+    timeDifference = currentDate - (date.seconds * 1000);
+  }
+
   const seconds = Math.floor(timeDifference / 1000);
 
   if (seconds >= 86400) {
@@ -22,7 +28,7 @@ const getTimePassed = (date) => {
   }
 };
 
-export function PlayerScore({ rank, playerName, speed, createdAt}) {
+export default memo(function PlayerScore({ rank, playerName, speed, createdAt}) {
   const timePassed = getTimePassed(createdAt);
 
   return (
@@ -40,4 +46,4 @@ export function PlayerScore({ rank, playerName, speed, createdAt}) {
       </div>
     </div>
   )
-}
+});

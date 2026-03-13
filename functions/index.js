@@ -1,7 +1,7 @@
 
 const {initializeApp} = require("firebase-admin/app");
 const {getAuth} = require("firebase-admin/auth");
-const {getFirestore} = require("firebase-admin/firestore");
+const {getFirestore, FieldValue} = require("firebase-admin/firestore");
 const {setGlobalOptions} = require("firebase-functions");
 const {onCall} = require("firebase-functions/v2/https");
 
@@ -124,4 +124,55 @@ exports.signup = onCall(async (request) => {
   return {
     ok: true,
   }
+});
+
+exports.updateQuoteScores = onCall(async (request) => {
+  if (!request.auth) return { ok: false, code: "NOT_AUTHENTICATED"};
+
+  const { quoteId, speed } = request.data;
+  const playerName = request.auth.token.name;
+
+  if (!quoteId || !speed) {
+    return { ok: false, code: "EMPTY_FIELDS" }
+  }
+
+  try {
+    const batch = getFirestore().batch();
+
+    const collectionRef = getFirestore().collection("leaderboard").doc(quoteId).collection("scores");
+
+    // Check if scores count exceeded the max amount
+
+    const snapshot = await collectionRef.count().get();
+    const count = snapshot.data().count;
+
+    if (count >= 10) {
+      const q = collectionRef.orderBy("speed", "asc").limit(1);
+      const querySnapshot = await q.get();
+
+      const slowestData = querySnapshot.docs[0].data();
+
+      if (speed > slowestData.speed) {
+        batch.delete(querySnapshot.docs[0].ref);
+      }
+      else {
+        return { ok: true, code: "TOO_SLOW" }
+      }
+    }
+
+    const docRef = collectionRef.doc();
+
+    batch.create(docRef, {
+      playerName,
+      speed,
+      createdAt: FieldValue.serverTimestamp(),
+    });
+
+    await batch.commit();
+  }
+  catch (error) {
+    return { ok: false, code: "INTERNAL_SERVER_ERROR" }
+  }
+
+  return { ok: true, code: "NEW_SCORE_STORED" };
 });

@@ -5,8 +5,13 @@ import { useTimer } from "../../custom-hooks/useTimer";
 import { useLiveData } from "../../custom-hooks/useLiveData";
 import { forwardRef, useEffect, useImperativeHandle } from "react";
 import { useFinalData } from "../../custom-hooks/useFinalData";
+import { httpsCallable } from "firebase/functions";
+import { functions } from "../../../firebase";
+import { useAuth } from "../../custom-hooks/useAuth";
 
-export const RoomData = forwardRef(({ gameState, targetWords, committedWords, typedWord, currentWordIndex, mistakes, clearWords, resetMistakes, setGameIdle, setGameRunning, focusGameInput, pickNewQuote }, ref) => {
+export const RoomData = forwardRef(({ quoteId, gameState, targetWords, committedWords, typedWord, currentWordIndex, mistakes, clearWords, resetMistakes, setGameIdle, setGameRunning, focusGameInput, pickNewQuote }, ref) => {
+  const { userRecord } = useAuth();
+
   const {
     startTime,
     timeElapsed,
@@ -58,9 +63,7 @@ export const RoomData = forwardRef(({ gameState, targetWords, committedWords, ty
     if (gameState !== "finished") return;
 
     const finalTimeElapsed = (Date.now() - startTime) / 1000;
-
     const finalWpm = getTypingSpeed(targetWords, committedWords, typedWord, currentWordIndex, finalTimeElapsed);
-    
     const finalAccuracy = getAccuracy(targetWords, committedWords, typedWord, currentWordIndex, mistakes);
 
     stopTimer();
@@ -75,6 +78,23 @@ export const RoomData = forwardRef(({ gameState, targetWords, committedWords, ty
     console.log("Cleared mistakes count.");
     resetTimer();
     console.log("Cleared time elapsed.");
+
+    (async () => {
+      const updateQuoteScores = httpsCallable(functions, "updateQuoteScores");
+
+      try {
+        const result = await updateQuoteScores({ quoteId, speed: finalWpm });
+        
+        console.log(result.data);
+      }
+      catch (e) {
+        console.error(e)
+      }
+        
+      console.log("Stored score to firestore.")
+
+    })();
+
   }, [gameState]);
   
   return (
@@ -85,6 +105,7 @@ export const RoomData = forwardRef(({ gameState, targetWords, committedWords, ty
         handleStartGame={handleStartGame}
       />
       <RoomPlayers
+        playerName={userRecord?.displayName || "..."}
         wpm={gameState === "finished" ? finalWpm : liveWpm}
         accuracy={gameState === "finished" ? finalAccuracy : liveAccuracy}
         mistakesCount={gameState === "finished" ? finalMistakesCount : mistakes}
