@@ -136,6 +136,10 @@ exports.updateQuoteScores = onCall(async (request) => {
     return { ok: false, code: "EMPTY_FIELDS" }
   }
 
+  if (speed > 400) {
+    return { ok: false, code: "TOO_FAST" }
+  }
+
   try {
     const batch = getFirestore().batch();
 

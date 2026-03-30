@@ -20,8 +20,6 @@ export function useBestScores(quoteId) {
           });
         });
 
-        console.log(scores)
-
         setBestScores(scores);
       }
       else {

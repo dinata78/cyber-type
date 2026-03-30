@@ -1,7 +1,5 @@
-import { memo } from "react";
-import styles from "./PlayerScore.module.css";
 
-const getTimePassed = (date) => {
+export const getTimePassed = (date) => {
   let timeDifference = 0;
   
   if (date) {
@@ -27,23 +25,3 @@ const getTimePassed = (date) => {
     return `${seconds} ${seconds === 1 ? "second" : "seconds"}`;
   }
 };
-
-export default memo(function PlayerScore({ rank, playerName, speed, createdAt}) {
-  const timePassed = getTimePassed(createdAt);
-
-  return (
-    <div className={styles.mainContainer}>
-      <div className={styles.rank}>
-        {rank}.
-      </div>
-      <div className={styles.name}>
-        <span>{playerName}</span>
-        <span className={styles.date}>{timePassed} ago</span>
-      </div>
-      <div className={styles.speed}>
-        <span>{speed}</span>
-        <span>WPM</span>
-      </div>
-    </div>
-  )
-});

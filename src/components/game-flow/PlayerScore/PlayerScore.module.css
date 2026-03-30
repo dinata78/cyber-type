@@ -51,6 +51,11 @@
   font-weight: bold;
 }
 
+.playerName {
+  cursor: pointer;
+  text-decoration: underline;
+}
+
 .date {
   color: #aac;
   font-weight: lighter;

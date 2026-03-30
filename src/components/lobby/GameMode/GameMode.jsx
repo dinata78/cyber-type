@@ -1,5 +1,5 @@
 import styles from "./GameMode.module.css";
-import { NavLink } from "../NavLink/NavLink";
+import { NavLink } from "../../header/NavLink/NavLink";
 
 export function GameMode() {
   return (

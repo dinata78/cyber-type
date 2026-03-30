@@ -19,7 +19,7 @@ export default memo(function PlayerCard({ cardStyle, username, imgUrl, wpm, accu
         <div className={styles.player}>
           <img
             className={styles.pfp}
-            src={imgUrl || "typer-1.webp"}
+            src={imgUrl || "/typer-1.webp"}
           />
           <div className={styles.username}>
             <span>{username || "<NOT_FOUND>"}</span>

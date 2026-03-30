@@ -1,5 +1,5 @@
-import PlayerScore from "../PlayerScore/PlayerScore"
 import styles from "./QuoteLeaderboard.module.css"
+import PlayerScore from "../PlayerScore/PlayerScore"
 
 export function QuoteLeaderboard({ bestScores }) {
   const sortedData = bestScores.toSorted((a, b) => b.speed - a.speed);

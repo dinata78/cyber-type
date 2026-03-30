@@ -1,8 +1,8 @@
 import styles from "./Profile.module.css";
 import { useEffect, useRef, useState } from "react";
-import { ProfilePopover } from "../ProfilePopover/ProfilePopover";
-import { useAuth } from "../../custom-hooks/useAuth";
 import { useNavigate } from "react-router-dom";
+import { ProfilePopover } from "../ProfilePopover/ProfilePopover";
+import { useAuth } from "../../../custom-hooks/useAuth";
 
 export function Profile() {
   const [ isPopoverVisible, setIsPopoverVisible ] = useState(false);

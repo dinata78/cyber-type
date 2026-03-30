@@ -1,0 +1,16 @@
+
+/* Layout CSS */
+
+.mainContainer {
+  flex-grow: 1;
+  height: 0;
+  padding-block: 4px;
+  overflow-y: scroll;
+}
+
+/* Visual CSS */
+
+.mainContainer {
+  scrollbar-width: thin;
+  scrollbar-color: #aab transparent;
+}

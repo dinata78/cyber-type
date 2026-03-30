@@ -1,0 +1,115 @@
+
+/* Layout CSS */
+
+.mainContainer {
+  height: 100%;
+  padding: 18px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.pfp {
+  aspect-ratio: 1 / 1;
+  height: 100%;
+  object-fit: cover;
+}
+
+.identity {
+  flex-grow: 1;
+  width: 0;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.username, .bio {
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.bio {
+  flex-grow: 1;
+  height: 0;
+}
+
+.records {
+  aspect-ratio: 1 / 1;
+  height: 100%;
+  padding: 12px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 12px;
+}
+
+.recordsItem {
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.recordsTag {
+  width: 100%;
+  height: 50%;
+  padding-block: 6px;
+  display: flex;
+  justify-content: center;
+  align-items: center;  
+}
+
+.recordsData {
+  width: 100%;
+  height: 50%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Visual CSS */
+
+.pfp {
+  border: 1px solid var(--color-two);
+}
+
+.tag {
+  color: #aab;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.username, .bio {
+  border: 1px solid var(--color-two);
+  color: var(--color-two);
+  line-height: 1.5;
+  font-size: 14px;
+}
+
+.bio {
+  overflow: hidden;
+  overflow-wrap: break-word;
+}
+
+.records {
+  border: 1px solid var(--color-two);
+}
+
+.recordsItem {
+  border: 1px solid var(--color-two);
+  color: white;
+  font-size: 16px;
+}
+
+.recordsTag {
+  color: #aab;
+  font-size: 12px;
+  font-weight: bold;
+  text-align: center;
+  line-height: 1.5;
+}

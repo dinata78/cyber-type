@@ -1,12 +1,12 @@
 import styles from "./Auth.module.css";
 import { useEffect, useRef, useState } from "react";
-import { AuthPopover } from "../AuthPopover/AuthPopover";
-import { AuthButton } from "../AuthButton/AuthButton";
-import { useAuth } from "../../custom-hooks/useAuth";
-import { auth, functions } from "../../../firebase";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { httpsCallable } from "firebase/functions";
-import { useErrorMessages } from "../../custom-hooks/useErrorMessages";
+import { auth, functions } from "../../../../firebase"
+import { AuthPopover } from "../AuthPopover/AuthPopover";
+import { AuthButton } from "../AuthButton/AuthButton";
+import { useAuth } from "../../../custom-hooks/useAuth"
+import { useErrorMessages } from "../../../custom-hooks/useErrorMessages";
 
 export function Auth() {
   const [ popoverState, setPopoverState ] = useState("closed");

@@ -2,9 +2,9 @@ import styles from "./Header.module.css";
 import { useNavigate } from "react-router-dom";
 import { NavLink } from "../NavLink/NavLink";
 import { UserSearch } from "../UserSearch/UserSearch";
-import { useAuth } from "../../custom-hooks/useAuth";
-import { Auth } from "../Auth/Auth";
+import { Auth } from "../../auth/Auth/Auth";
 import { Profile } from "../Profile/Profile";
+import { useAuth } from "../../../custom-hooks/useAuth";
 
 export function Header() {
   const navigate = useNavigate();

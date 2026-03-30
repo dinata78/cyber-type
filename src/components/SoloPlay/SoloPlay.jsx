@@ -1,13 +1,13 @@
 import styles from "./SoloPlay.module.css";
 import { useEffect, useRef } from "react";
-import { GameInput } from "../GameInput/GameInput";
+import { GameInput } from "../game-flow/GameInput/GameInput";
+import { Quote } from "../quote/Quote/Quote";
+import { RoomData } from "../game-flow/RoomData/RoomData";
+import { QuoteLeaderboard } from "../game-flow/QuoteLeaderboard/QuoteLeadeboard";
 import { useGameState } from "../../custom-hooks/useGameState";
 import { useQuote } from "../../custom-hooks/useQuote";
 import { useMistakes } from "../../custom-hooks/useMistakes";
 import { useTypingLogic } from "../../custom-hooks/useTypingLogic";
-import { Quote } from "../Quote/Quote";
-import { RoomData } from "../RoomData/RoomData";
-import { QuoteLeaderboard } from "../QuoteLeaderboard/QuoteLeadeboard";
 import { useBestScores } from "../../custom-hooks/useBestScores";
 
 export function SoloPlay() {
