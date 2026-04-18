@@ -12,7 +12,7 @@ export function QuoteLeaderboard({ bestScores }) {
           sortedData.map((data, index) => {
             return (
               <PlayerScore
-                key={data.id}
+                key={data.createdAt - index}
                 rank={index + 1}
                 playerName={data.playerName}
                 speed={data.speed}

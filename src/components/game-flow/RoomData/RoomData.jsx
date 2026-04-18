@@ -9,7 +9,7 @@ import { useTimer } from "../../../custom-hooks/useTimer";
 import { useLiveData } from "../../../custom-hooks/useLiveData";
 import { useFinalData } from "../../../custom-hooks/useFinalData";
 
-export const RoomData = forwardRef(({ quoteId, gameState, targetWords, committedWords, typedWord, currentWordIndex, mistakes, clearWords, resetMistakes, setGameIdle, setGameRunning, focusGameInput, pickNewQuote }, ref) => {
+export const RoomData = forwardRef(({ quoteId, quoteOrigin, quoteDifficulty, gameState, targetWords, committedWords, typedWord, currentWordIndex, mistakes, clearWords, resetMistakes, setGameIdle, setGameRunning, focusGameInput, pickNewQuote }, ref) => {
   const { userRecord } = useAuth();
 
   const {
@@ -62,15 +62,15 @@ export const RoomData = forwardRef(({ quoteId, gameState, targetWords, committed
   useEffect(() => {
     if (gameState !== "finished") return;
 
-    const finalTimeElapsed = (Date.now() - startTime) / 1000;
-    const finalWpm = getTypingSpeed(targetWords, committedWords, typedWord, currentWordIndex, finalTimeElapsed);
-    const finalAccuracy = getAccuracy(targetWords, committedWords, typedWord, currentWordIndex, mistakes);
+    const recomputedTimeElapsed = (Date.now() - startTime) / 1000;
+    const recomputedWpm = getTypingSpeed(targetWords, committedWords, typedWord, currentWordIndex, recomputedTimeElapsed);
+    const recomputedAccuracy = getAccuracy(targetWords, committedWords, typedWord, currentWordIndex, mistakes);
 
     stopTimer();
     console.log("Stopped timer.");
     resetStartTime();
     console.log("Reset start time.");
-    storeFinalData(finalWpm, finalAccuracy, mistakes);
+    storeFinalData(recomputedWpm, recomputedAccuracy, mistakes);
     console.log("Stored final datas.");
     clearWords();
     console.log("Cleared commited and typed word/s.");
@@ -80,19 +80,25 @@ export const RoomData = forwardRef(({ quoteId, gameState, targetWords, committed
     console.log("Cleared time elapsed.");
 
     (async () => {
-      const updateQuoteScores = httpsCallable(functions, "updateQuoteScores");
+      const recordMatchResult = httpsCallable(functions, "recordMatchResult");
 
       try {
-        const result = await updateQuoteScores({ quoteId, speed: finalWpm });
-        
+        const result = await recordMatchResult({
+          quoteId,
+          quoteOrigin,
+          quoteDifficulty,
+          speed: recomputedWpm,
+          accuracy: recomputedAccuracy,
+          mistakes,
+        });
+
         console.log(result.data);
       }
       catch (e) {
-        console.error(e)
+        console.error(e);
       }
-        
-      console.log("Stored score to firestore.")
 
+      console.log("Ran recordMatchResult");
     })();
 
   }, [gameState]);

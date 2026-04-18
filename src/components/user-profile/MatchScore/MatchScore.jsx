@@ -15,7 +15,9 @@ import { getTimePassed } from "../../../utils/getTimePassed";
       <div className={styles.wrapper}>
         <span>{quote}</span>
         <div>
-          <span className={styles[difficulty]}>{difficulty}</span>
+          <span className={styles[difficulty?.toLowerCase()]}>
+            {difficulty?.toLowerCase()}
+          </span>
           <span>, {getTimePassed(createdAt)} ago</span>
         </div>
       </div>

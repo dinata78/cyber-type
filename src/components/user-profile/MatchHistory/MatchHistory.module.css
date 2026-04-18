@@ -3,8 +3,7 @@
 
 .mainContainer {
   flex-grow: 1;
-  padding: 12px;
-  padding-top: 0;
+  padding-inline: 12px;
   display: flex;
   flex-direction: column;
 }
@@ -50,6 +49,28 @@
   flex-direction: column;
 }
 
+.pagination {
+  height: 48px;
+  padding-block: 8px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+}
+
+.button {
+  height: 100%;
+  width: 64px;
+}
+
+.arrow {
+  width: 32px;
+}
+
+.pageNumber {
+  margin-inline: auto;
+}
+
 /* Visual CSS */
 
 .header {
@@ -62,4 +83,25 @@
   border: 1px solid #aab;
   scrollbar-width: thin;
   scrollbar-color: #aab transparent;
+}
+
+.pagination {
+  font-size: 12px;
+}
+
+.button {
+  background-color: transparent;
+  border: 1px solid #aab;
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.button:hover {
+  background-color: #444;
+}
+
+.pageNumber {
+  color: white;
+  font-weight: bold;
 }

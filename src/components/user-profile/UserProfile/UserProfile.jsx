@@ -4,9 +4,18 @@ import { Averages } from "../Averages/Averages";
 import { Banner } from "../Banner/Banner";
 import { MatchHistory } from "../MatchHistory/MatchHistory";
 import { BestScores } from "../BestScores/BestScores";
+import { useBest } from "../../../custom-hooks/useBest";
+import { useMatchAmount } from "../../../custom-hooks/useMatchAmount";
+import { useAverages } from "../../../custom-hooks/useAverages";
 
 export function UserProfile() {
   const { username } = useParams();
+
+  const usernameKey = username.toLowerCase();
+
+  const { bestScores, bestSpeed } = useBest(usernameKey)
+  const { matchAmount } = useMatchAmount(usernameKey);
+  const { averages } = useAverages(usernameKey, matchAmount);
 
   return (
     <div className={styles.mainContainer}>
@@ -17,10 +26,10 @@ export function UserProfile() {
           <Banner
             username={username}
             bio={"Lorem ipsum dolor sit amet consectetur adipisicing elit. Suscipit consequatur saepe quod placeat eveniet illum atque exercitationem beatae! Fugiat corporis accusantium vitae quibusdam explicabo moles."}
-            bestSpeed={131.43}
+            bestSpeed={bestSpeed}
             playerRating={1000}
-            totalGamesPlayed={2278}
-            totalGamesWon={2087}
+            totalGamesPlayed={matchAmount}
+            totalGamesWon={matchAmount}
           />
         </div>
 
@@ -32,9 +41,9 @@ export function UserProfile() {
           </div>
 
           <Averages
-            speed={128.46}
-            accuracy={96.08}
-            mistakesCount={9.32}
+            speed={averages.recent?.speed || null}
+            accuracy={averages.recent?.accuracy || null}
+            mistakesCount={averages.recent?.mistakes || null}
           />
         </div>
 
@@ -46,9 +55,9 @@ export function UserProfile() {
           </div>
 
           <Averages
-            speed={110.67}
-            accuracy={94.89}
-            mistakesCount={12.78}
+            speed={averages.allTime?.speed || null}
+            accuracy={averages.allTime?.accuracy || null}
+            mistakesCount={averages.allTime?.mistakes || null}
           />
         </div>
 
@@ -59,7 +68,10 @@ export function UserProfile() {
             MATCH HISTORY
           </div>
 
-          <MatchHistory />
+          <MatchHistory
+            username={username}
+            totalPage={Math.ceil(matchAmount / 25)}
+          />
         </div>
 
         <div
@@ -69,7 +81,7 @@ export function UserProfile() {
             BEST SCORES
           </div>
 
-          <BestScores />
+          <BestScores bestScores={bestScores} />
         </div>
       </div>
     </div>

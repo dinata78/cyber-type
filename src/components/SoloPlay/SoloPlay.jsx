@@ -8,14 +8,14 @@ import { useGameState } from "../../custom-hooks/useGameState";
 import { useQuote } from "../../custom-hooks/useQuote";
 import { useMistakes } from "../../custom-hooks/useMistakes";
 import { useTypingLogic } from "../../custom-hooks/useTypingLogic";
-import { useBestScores } from "../../custom-hooks/useBestScores";
+import { useQuoteBest } from "../../custom-hooks/useQuoteBest";
 
 export function SoloPlay() {
   const { gameState, setGameIdle, setGameRunning, setGameFinished } = useGameState();
 
   const { quote, isQuoteLoading, pickNewQuote } = useQuote();
   
-  const { bestScores } = useBestScores(quote.id);
+  const { quoteBest } = useQuoteBest(quote.id);
 
   const targetWords = !isQuoteLoading ? quote.text.split(" ") : [];
 
@@ -87,6 +87,8 @@ export function SoloPlay() {
           <RoomData
             ref={roomDataRef}
             quoteId={quote.id}
+            quoteOrigin={quote.origin}
+            quoteDifficulty={quote.difficulty}
             gameState={gameState}
             targetWords={targetWords}
             committedWords={committedWords}
@@ -126,7 +128,7 @@ export function SoloPlay() {
 
         <div className={styles.right}>
           <QuoteLeaderboard
-            bestScores={bestScores}
+            bestScores={quoteBest}
           />
         </div>
       </div>      
