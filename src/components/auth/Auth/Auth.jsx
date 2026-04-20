@@ -1,6 +1,6 @@
 import styles from "./Auth.module.css";
 import { useEffect, useRef, useState } from "react";
-import { signInWithEmailAndPassword } from "firebase/auth";
+import { signInWithCustomToken, signInWithEmailAndPassword } from "firebase/auth";
 import { httpsCallable } from "firebase/functions";
 import { auth, functions } from "../../../../firebase"
 import { AuthPopover } from "../AuthPopover/AuthPopover";
@@ -14,8 +14,6 @@ export function Auth() {
   const [ isSubmitting, setIsSubmitting ] = useState(false);
 
   const mainContainerRef = useRef(null);
-
-  const { login } = useAuth();
 
   const { getErrorMessage } = useErrorMessages();
 
@@ -34,20 +32,29 @@ export function Auth() {
     const username = formData.get("username");
     const password = formData.get("password");
 
+    if (!username || !password) {
+      setErrorMessage(getErrorMessage("EMPTY_FIELDS"))
+    }
+
     setIsSubmitting(true);
 
-    const result = await login(username, password);
+    const getLoginToken = httpsCallable(functions, "getLoginToken");
+    const result = await getLoginToken({ username, password });
 
     setIsSubmitting(false);
 
-    console.log(result);
+    console.log(result.data);
 
-    if (result.ok) {
-      closePopover();
+    if (!result.data.ok) {
+      setErrorMessage(getErrorMessage(result.data.code));
+      return;
     }
-    else {
-      setErrorMessage(getErrorMessage(result.code));
-    }
+
+    const loginToken = result.data.loginToken;
+
+    await signInWithCustomToken(auth, loginToken);
+
+    console.log("Login success.");
   }
 
   const handleSignupSubmit = async (e) => {
@@ -75,12 +82,15 @@ export function Auth() {
       setErrorMessage(getErrorMessage("INVALID_PASSWORD_LENGTH"));
       return;
     }
-
-    const signup = httpsCallable(functions, "signup");
-
+    
     setIsSubmitting(true);
-
-    const result = await signup({ email, username, password });
+    
+    const signup = httpsCallable(functions, "signup");
+    const result = await signup({
+      email,
+      username,
+      password
+    });
 
     setIsSubmitting(false);
 

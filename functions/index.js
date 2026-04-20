@@ -1,10 +1,13 @@
 
+const { default: axios } = require("axios");
 const {initializeApp} = require("firebase-admin/app");
 const {getAuth} = require("firebase-admin/auth");
 const {getFirestore, Timestamp} = require("firebase-admin/firestore");
 const {setGlobalOptions} = require("firebase-functions");
 const {onCall} = require("firebase-functions/v2/https");
 const { runTransaction } = require("firebase/firestore");
+
+const firebaseApiKey = "AIzaSyCUk7_Hao2fzi46IbQsITtbWFgT25vwwXg";
 
 initializeApp();
 
@@ -92,23 +95,22 @@ exports.signup = onCall(async (request) => {
   try {
     const batch = getFirestore().batch();
 
+    const userRef = getFirestore().collection("users").doc(userRecord.uid);
+    const usernameRef = getFirestore().collection("usernames").doc(usernameKey);
+    const emailRef = getFirestore().collection("emails").doc(userRecord.uid);
+
     // Store user's data
-    batch.set(
-      getFirestore().collection("users").doc(userRecord.uid),
-      {
-        uid: userRecord.uid,
-        email: userRecord.email,
-        username: userRecord.displayName,
-      }
-    );
+    batch.set(userRef,{
+      uid: userRecord.uid,
+      username: userRecord.displayName,
+      bio: "",
+    });
 
     // Map username key to uid 
-    batch.set(
-      getFirestore().collection("usernames").doc(usernameKey),
-      {
-        uid: userRecord.uid,
-      }
-    );
+    batch.set(usernameRef, { uid: userRecord.uid });
+
+    // Store user's email
+    batch.set(emailRef, { email: userRecord.email });
 
     await batch.commit();
   }
@@ -124,6 +126,56 @@ exports.signup = onCall(async (request) => {
   
   return {
     ok: true,
+  }
+});
+
+exports.getLoginToken = onCall(async (request) => {
+  if (request.auth) return { ok: false, code: "ALREADY_LOGGED_IN" }
+
+  const { username, password } = request.data;
+
+  if (!username || !password) {
+    return { ok: false, code: "EMPTY_FIELDS" }
+  }
+
+  const usernameKey = username.replaceAll(/\s+/g, " ").trim().toLowerCase();
+
+  try {
+    const usernameRef = getFirestore().collection("usernames").doc(usernameKey);
+    const usernameSnapshot = await usernameRef.get();
+
+    if (!usernameSnapshot.exists) {
+      return { ok: false, code: "USERNAME_NOT_FOUND" }
+    }
+
+    const uid = usernameSnapshot.data().uid;
+
+    const emailRef = getFirestore().collection("emails").doc(uid);
+    const emailDoc = await emailRef.get();
+    const email = emailDoc.data().email;
+
+    const res = await axios.post(`http://127.0.0.1:9099/identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${firebaseApiKey}`, {
+      email,
+      password,
+      returnSecureToken: true,
+    });
+
+    const localId = res.data.localId;
+
+    const customToken = await getAuth().createCustomToken(localId);
+
+    return { ok: true, loginToken: customToken }
+  }
+  catch (error) {
+    const code = error.response?.data?.error?.message;
+
+    if (code === "INVALID_PASSWORD") {
+      return { ok: false, code: "WRONG_PASSWORD" }
+    }
+    else if (code === "USER_DISABLED") {
+      return { ok: false, code: "USER_DISABLED" }
+    }
+    else return { ok: false, code: "INTERNAL_SERVER_ERROR" }
   }
 });
 
@@ -351,10 +403,10 @@ exports.recordMatchResult = onCall(async (request) => {
         countInLatest: newHistoryMeta.countInLatest,
       });
     });
-
-    return { ok: true, code: "MATCH_RESULT_RECORDED" }
   }
   catch (e) {
     return { ok: false, code: "INTERNAL_SERVER_ERROR", error: e.message }
   }
+
+  return { ok: true, code: "MATCH_RESULT_RECORDED" }
 });

@@ -13,7 +13,7 @@ export function UserProfile() {
 
   const usernameKey = username.toLowerCase();
 
-  const { bestScores, bestSpeed } = useBest(usernameKey)
+  const { bestScores, bestSpeed } = useBest(usernameKey);
   const { matchAmount } = useMatchAmount(usernameKey);
   const { averages } = useAverages(usernameKey, matchAmount);
 

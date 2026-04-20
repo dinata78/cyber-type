@@ -26,8 +26,8 @@ export function useBest(username) {
         setBestSpeed(bestSpeed);
       }
       else {
-        setBestScores(bestScores);
-        setBestSpeed(bestSpeed);        
+        setBestScores([]);
+        setBestSpeed(0);        
       }
     })();
   }, [username]);
