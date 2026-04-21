@@ -8,7 +8,7 @@ export function MatchHistory({ username, totalPage }) {
   const [ searchParams, setSearchParams ] = useSearchParams();
 
   const matchEndRef = useRef(null);
-  const hasScrolledToMatchEnd = useRef(false);
+  const newestButtonRef = useRef(null);
 
   const currentPage = Number(searchParams.get("matchPage"));
 
@@ -27,20 +27,14 @@ export function MatchHistory({ username, totalPage }) {
   }
 
   useEffect(() => {
-    if (totalPage && !(searchParams.get("matchPage"))) {
-      setSearchParams({ matchPage: totalPage }, { replace: true });
-    }
-  }, [totalPage, searchParams, setSearchParams]);
+    newestButtonRef?.current?.click();
+  }, [totalPage]);
 
   useEffect(() => {
-    if (
-      matchScores.length > 0 
-      && !hasScrolledToMatchEnd.current
-    ) {
+    if (currentPage === totalPage) {
       matchEndRef.current?.scrollIntoView({ behavior: "smooth" });
-      hasScrolledToMatchEnd.current = true;
     }
-  }, [matchScores.length]);
+  }, [matchScores.length, currentPage, totalPage]);
 
   return (
     <div className={styles.mainContainer}>
@@ -87,7 +81,7 @@ export function MatchHistory({ username, totalPage }) {
         </button>
 
         <span className={styles.pageNumber}>
-          PAGE {currentPage} OF {totalPage || 1}
+          PAGE {currentPage} OF {totalPage}
         </span>
 
         <button
@@ -98,6 +92,7 @@ export function MatchHistory({ username, totalPage }) {
         </button>
 
         <button
+          ref={newestButtonRef}
           className={styles.button}
           onClick={() => goToPage(totalPage)}
         >

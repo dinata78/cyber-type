@@ -7,12 +7,15 @@ import { BestScores } from "../BestScores/BestScores";
 import { useBest } from "../../../custom-hooks/useBest";
 import { useMatchAmount } from "../../../custom-hooks/useMatchAmount";
 import { useAverages } from "../../../custom-hooks/useAverages";
+import { useUserData } from "../../../custom-hooks/useUserData";
+import { useEffect } from "react";
 
 export function UserProfile() {
   const { username } = useParams();
 
   const usernameKey = username.toLowerCase();
 
+  const { userData } = useUserData(usernameKey);
   const { bestScores, bestSpeed } = useBest(usernameKey);
   const { matchAmount } = useMatchAmount(usernameKey);
   const { averages } = useAverages(usernameKey, matchAmount);
@@ -24,8 +27,9 @@ export function UserProfile() {
           className={`${styles.banner} ${styles.gridItem}`}
         >
           <Banner
-            username={username}
-            bio={"Lorem ipsum dolor sit amet consectetur adipisicing elit. Suscipit consequatur saepe quod placeat eveniet illum atque exercitationem beatae! Fugiat corporis accusantium vitae quibusdam explicabo moles."}
+            username={userData.username}
+            bio={userData.bio}
+            imageUrl={userData.imageUrl}
             bestSpeed={bestSpeed}
             playerRating={1000}
             totalGamesPlayed={matchAmount}

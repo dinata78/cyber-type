@@ -1,12 +1,12 @@
 import styles from "./Banner.module.css";
 
-export function Banner({ username, bio, bestSpeed, playerRating, totalGamesPlayed, totalGamesWon }) {
+export function Banner({ username, bio, imageUrl, bestSpeed, playerRating, totalGamesPlayed, totalGamesWon }) {
   
   return (
     <div className={styles.mainContainer}>
       <img
         className={styles.pfp}
-        src={"/typer-1.webp"}
+        src={imageUrl || "/typer-1.webp"}
       />
 
       <div className={styles.identity}>
