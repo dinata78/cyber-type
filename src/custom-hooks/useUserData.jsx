@@ -4,27 +4,45 @@ import { db } from "../../firebase";
 
 export function useUserData(username) {
   const [userData, setUserData] = useState({});
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const getUserData = async () => {
-      const usernameRef = doc(db, "usernames", username);
-      const usernameSnapshot = await getDoc(usernameRef);
-      const userId = usernameSnapshot.data()?.uid || null;
-      
-      if (!userId) {
+      if (!username) {
         setUserData({});
         return;
       }
 
-      const userRef = doc(db, "users", userId);
-      const userSnapshot = await getDoc(userRef);
-      const userData = userSnapshot.data() || {};
+      setIsLoading(true);
+      setUserData({});
 
-      setUserData(userData);
+      try {
+        const usernameRef = doc(db, "usernames", username);
+        const usernameSnapshot = await getDoc(usernameRef);
+        const userId = usernameSnapshot.data()?.uid || null;
+        
+        if (!userId) {
+          setUserData({});
+          return;
+        }
+
+        const userRef = doc(db, "users", userId);
+        const userSnapshot = await getDoc(userRef);
+        const userData = userSnapshot.data() || {};
+
+        setUserData(userData);
+      }
+      catch (e) {
+        setUserData({});
+        console.error(e);
+      }
+      finally {
+        setIsLoading(false);
+      }
     }
 
     getUserData();
   }, [username]);
 
-  return { userData }
+  return { userData, isUserDataLoading: isLoading }
 }

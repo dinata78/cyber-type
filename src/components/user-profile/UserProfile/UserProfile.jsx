@@ -1,25 +1,33 @@
 import styles from "./UserProfile.module.css";
+import { useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { Averages } from "../Averages/Averages";
 import { Banner } from "../Banner/Banner";
 import { MatchHistory } from "../MatchHistory/MatchHistory";
 import { BestScores } from "../BestScores/BestScores";
 import { useBest } from "../../../custom-hooks/useBest";
-import { useMatchAmount } from "../../../custom-hooks/useMatchAmount";
 import { useAverages } from "../../../custom-hooks/useAverages";
 import { useUserData } from "../../../custom-hooks/useUserData";
-import { useEffect } from "react";
+import { useMatchScores } from "../../../custom-hooks/useMatchScores";
 
 export function UserProfile() {
   const { username } = useParams();
 
   const usernameKey = username.toLowerCase();
 
-  const { userData } = useUserData(usernameKey);
-  const { bestScores, bestSpeed } = useBest(usernameKey);
-  const { matchAmount } = useMatchAmount(usernameKey);
-  const { averages } = useAverages(usernameKey, matchAmount);
+  const { userData, isUserDataLoading } = useUserData(usernameKey);
+  const { bestScores, bestSpeed, isBestLoading } = useBest(usernameKey);
+  const { averages, matchAmount, isAveragesLoading } = useAverages(usernameKey);
+  const {
+    matchScores,
+    matchOffset,
+    currentPage,
+    goToPage,
+    isMatchScoresLoading
+  } = useMatchScores(username);
 
+  const isBannerLoading = isUserDataLoading || isBestLoading || isAveragesLoading;
+  
   return (
     <div className={styles.mainContainer}>
       <div className={styles.gridWrapper}>
@@ -34,6 +42,7 @@ export function UserProfile() {
             playerRating={1000}
             totalGamesPlayed={matchAmount}
             totalGamesWon={matchAmount}
+            isLoading={isBannerLoading}
           />
         </div>
 
@@ -45,9 +54,10 @@ export function UserProfile() {
           </div>
 
           <Averages
-            speed={averages.recent?.speed || null}
-            accuracy={averages.recent?.accuracy || null}
-            mistakesCount={averages.recent?.mistakes || null}
+            speed={averages.recent?.speed}
+            accuracy={averages.recent?.accuracy}
+            mistakesCount={averages.recent?.mistakes}
+            isLoading={isAveragesLoading}
           />
         </div>
 
@@ -59,9 +69,10 @@ export function UserProfile() {
           </div>
 
           <Averages
-            speed={averages.allTime?.speed || null}
-            accuracy={averages.allTime?.accuracy || null}
-            mistakesCount={averages.allTime?.mistakes || null}
+            speed={averages.allTime?.speed}
+            accuracy={averages.allTime?.accuracy}
+            mistakesCount={averages.allTime?.mistakes}
+            isLoading={isAveragesLoading}
           />
         </div>
 
@@ -74,7 +85,11 @@ export function UserProfile() {
 
           <MatchHistory
             username={username}
+            currentPage={currentPage}
             totalPage={Math.ceil(matchAmount / 25)}
+            goToPage={goToPage}
+            matchScores={matchScores}
+            matchOffset={matchOffset}
           />
         </div>
 

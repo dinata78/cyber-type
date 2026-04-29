@@ -1,5 +1,5 @@
 import styles from "./Header.module.css";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { NavLink } from "../NavLink/NavLink";
 import { UserSearch } from "../UserSearch/UserSearch";
 import { Auth } from "../../auth/Auth/Auth";
@@ -16,15 +16,15 @@ export function Header() {
 
     const form = e.currentTarget;
     const formData = new FormData(form);
-    const query = formData.get("query").trim().toLowerCase();
+    const query = formData.get("query").trim();
 
     if (!query) return;
 
-    const currentPath = window.location.pathname;
-    const newPath = `/user/${query}`;
+    const currentPath = window.location.pathname.toLowerCase();
+    const newPath = `/user/${query.toLowerCase()}`;
 
     if (currentPath !== newPath) {
-      navigate(`/user/${query}`);
+      navigate(newPath);
     }
 
     form.reset();

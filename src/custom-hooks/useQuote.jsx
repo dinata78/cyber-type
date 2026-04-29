@@ -32,6 +32,7 @@ export function useQuote() {
       }
     }
     catch (e) {
+      setQuote({});
       console.error(e);
     }
     finally {

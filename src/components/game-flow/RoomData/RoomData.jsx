@@ -95,7 +95,7 @@ export const RoomData = forwardRef(({ quoteId, quoteOrigin, quoteDifficulty, gam
         console.log(result.data);
       }
       catch (e) {
-        console.error(e);
+        console.error("Failed to record match result: ", e);
       }
 
       console.log("Ran recordMatchResult");

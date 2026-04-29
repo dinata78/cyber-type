@@ -22,7 +22,7 @@ export function useAuth() {
       return { ok: false, code: "INTERNAL_SERVER_ERROR" }
     }
 
-    return { ok: true }
+    return { ok: true, code: "LOGOUT_SUCCESS" }
   }
 
   return {

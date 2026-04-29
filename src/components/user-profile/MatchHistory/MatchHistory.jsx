@@ -1,33 +1,22 @@
 import styles from "./MatchHistory.module.css";
-import { useSearchParams } from "react-router-dom";
 import { MatchScore } from "../MatchScore/MatchScore";
 import { useMatchScores } from "../../../custom-hooks/useMatchScores";
-import { useEffect, useRef } from "react";
+import { useEffect, useLayoutEffect, useRef } from "react";
 
-export function MatchHistory({ username, totalPage }) {
-  const [ searchParams, setSearchParams ] = useSearchParams();
+export function MatchHistory({ username, currentPage, totalPage, goToPage, matchScores, matchOffset }) {
 
   const matchEndRef = useRef(null);
   const newestButtonRef = useRef(null);
 
-  const currentPage = Number(searchParams.get("matchPage"));
-
-  const { matchScores, matchOffset } = useMatchScores(username, currentPage);
-
   const sortedMatchScores = matchScores.toSorted((a, b) => a.createdAt - b.createdAt);
 
-  const goToPage = (newPage) => {
-    if (
-      newPage >= 1 
-      && newPage <= totalPage 
-      && newPage !== currentPage
-    ) {
-      setSearchParams({ matchPage: newPage });
-    }
-  }
-
   useEffect(() => {
-    newestButtonRef?.current?.click();
+    if (
+      totalPage !== 0
+      && (currentPage <= 0 || currentPage > totalPage)
+    ) {
+      goToPage(totalPage, currentPage, totalPage);
+    }
   }, [totalPage]);
 
   useEffect(() => {
@@ -68,25 +57,32 @@ export function MatchHistory({ username, totalPage }) {
       <div className={styles.pagination}>
         <button
           className={styles.button}
-          onClick={() => goToPage(1)}
+          onClick={() => goToPage(1, currentPage, totalPage)}
         >
           OLDEST
         </button>
 
         <button
           className={`${styles.button} ${styles.arrow}`}
-          onClick={() => goToPage(currentPage - 1)}
+          onClick={() => goToPage(currentPage - 1, currentPage, totalPage)}
         >
           {"<<"}
         </button>
 
         <span className={styles.pageNumber}>
-          PAGE {currentPage} OF {totalPage}
+          {
+            totalPage > 0 &&
+            !(currentPage <= 0) &&
+            !(currentPage > totalPage) &&
+            <span>
+              PAGE {currentPage} OF {totalPage}
+            </span>            
+          }
         </span>
 
         <button
           className={`${styles.button} ${styles.arrow}`}
-          onClick={() => goToPage(currentPage + 1)}
+          onClick={() => goToPage(currentPage + 1, currentPage, totalPage)}
         >
           {">>"}
         </button>
@@ -94,7 +90,7 @@ export function MatchHistory({ username, totalPage }) {
         <button
           ref={newestButtonRef}
           className={styles.button}
-          onClick={() => goToPage(totalPage)}
+          onClick={() => goToPage(totalPage, currentPage, totalPage)}
         >
           NEWEST
         </button>

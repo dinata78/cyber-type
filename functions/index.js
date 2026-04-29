@@ -214,7 +214,7 @@ exports.recordMatchResult = onCall(async (request) => {
   const playerName = request.auth.token.name;
   const usernameKey = playerName.toLowerCase();
 
-  // Declare references
+  // Declare References
   const quoteBestRef = getFirestore().collection("quoteBest").doc(quoteId);
   const matchHistoryRef = getFirestore().collection("matchHistory").doc(usernameKey);
   const measurementsRef = getFirestore().collection("measurements").doc(usernameKey);
@@ -223,7 +223,7 @@ exports.recordMatchResult = onCall(async (request) => {
   // Logic
   try {
     await getFirestore().runTransaction(async (tx) => {
-      // Read Data From Firestore
+      // Read Data
       const quoteBestSnapshot = await tx.get(quoteBestRef);
       const matchHistorySnapshot = await tx.get(matchHistoryRef);
       const measurementsSnapshot = await tx.get(measurementsRef);

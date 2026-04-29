@@ -5,8 +5,8 @@ import { httpsCallable } from "firebase/functions";
 import { auth, functions } from "../../../../firebase"
 import { AuthPopover } from "../AuthPopover/AuthPopover";
 import { AuthButton } from "../AuthButton/AuthButton";
+import { getErrorMessage } from "./getErrorMessage";
 import { useAuth } from "../../../custom-hooks/useAuth"
-import { useErrorMessages } from "../../../custom-hooks/useErrorMessages";
 
 export function Auth() {
   const [ popoverState, setPopoverState ] = useState("closed");
@@ -14,8 +14,6 @@ export function Auth() {
   const [ isSubmitting, setIsSubmitting ] = useState(false);
 
   const mainContainerRef = useRef(null);
-
-  const { getErrorMessage } = useErrorMessages();
 
   const closePopover = () => setPopoverState("closed");
 
@@ -33,28 +31,43 @@ export function Auth() {
     const password = formData.get("password");
 
     if (!username || !password) {
-      setErrorMessage(getErrorMessage("EMPTY_FIELDS"))
+      setErrorMessage(getErrorMessage("EMPTY_FIELDS"));
+      return;
+    }
+
+    if (username.length > 16) {
+      setErrorMessage(getErrorMessage("INVALID_USERNAME_LENGTH"));
+      return;
+    }
+
+    if (password.length < 8 || password.length > 64) {
+      setErrorMessage(getErrorMessage("INVALID_PASSWORD_LENGTH"));
+      return;
     }
 
     setIsSubmitting(true);
 
-    const getLoginToken = httpsCallable(functions, "getLoginToken");
-    const result = await getLoginToken({ username, password });
+    try {
+      const getLoginToken = httpsCallable(functions, "getLoginToken");
+      const result = await getLoginToken({ username, password });
+      
+      if (!result.data.ok) {
+        setErrorMessage(getErrorMessage(result.data.code));
+        return;
+      }
 
-    setIsSubmitting(false);
+      const loginToken = result.data.loginToken;
 
-    console.log(result.data);
+      await signInWithCustomToken(auth, loginToken);
 
-    if (!result.data.ok) {
-      setErrorMessage(getErrorMessage(result.data.code));
-      return;
+      console.log("Login success.");
     }
-
-    const loginToken = result.data.loginToken;
-
-    await signInWithCustomToken(auth, loginToken);
-
-    console.log("Login success.");
+    catch (e) {
+      console.error(e);
+    }
+    finally {
+      setIsSubmitting(false);
+    }
   }
 
   const handleSignupSubmit = async (e) => {
@@ -85,27 +98,34 @@ export function Auth() {
     
     setIsSubmitting(true);
     
-    const signup = httpsCallable(functions, "signup");
-    const result = await signup({
-      email,
-      username,
-      password
-    });
-
-    setIsSubmitting(false);
-
-    console.log(result.data);
-
-    if (result.data.ok) {
-      await signInWithEmailAndPassword(
-        auth,
+    try {
+      const signup = httpsCallable(functions, "signup");
+      const result = await signup({
         email,
-        password,
-      )
-      closePopover();
+        username,
+        password
+      });
+
+      console.log(result.data);
+
+      if (result.data.ok) {
+        await signInWithEmailAndPassword(
+          auth,
+          email,
+          password,
+        )
+        closePopover();
+      }
+      else {
+        setErrorMessage(getErrorMessage(result.data.code));
+      }
     }
-    else {
-      setErrorMessage(getErrorMessage(result.data.code));
+    catch (e) {
+      console.error(e);
+      setErrorMessage(getErrorMessage("INTERNAL_SERVER_ERROR"))
+    }
+    finally {
+      setIsSubmitting(false);
     }
   }
 

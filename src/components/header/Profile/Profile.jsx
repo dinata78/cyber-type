@@ -22,7 +22,13 @@ export function Profile() {
 
   const handleProfileClick = () => {
     closePopover();
-    navigate(`/user/${userRecord.displayName}`)
+
+    const currentPath = window.location.pathname.toLowerCase();
+    const newPath = `/user/${userRecord.displayName.toLowerCase()}`;
+
+    if (currentPath !== newPath) {
+      navigate(newPath);
+    }
   }
 
   const handleLogOutClick = async () => {
