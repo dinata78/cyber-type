@@ -105,6 +105,11 @@
   overflow-wrap: break-word;
 }
 
+.emptyField {
+  color: #aab;
+  font-style: italic;
+}
+
 .records {
   border: 1px solid var(--color-two);
 }

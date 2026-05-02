@@ -24,9 +24,9 @@ export function UserProfile() {
     currentPage,
     goToPage,
     isMatchScoresLoading
-  } = useMatchScores(username);
+  } = useMatchScores(usernameKey);
 
-  const isBannerLoading = isUserDataLoading || isBestLoading || isAveragesLoading;
+  const isMainLoading = isUserDataLoading || isBestLoading || isAveragesLoading;
   
   return (
     <div className={styles.mainContainer}>
@@ -42,7 +42,7 @@ export function UserProfile() {
             playerRating={1000}
             totalGamesPlayed={matchAmount}
             totalGamesWon={matchAmount}
-            isLoading={isBannerLoading}
+            isLoading={isMainLoading}
           />
         </div>
 
@@ -57,7 +57,7 @@ export function UserProfile() {
             speed={averages.recent?.speed}
             accuracy={averages.recent?.accuracy}
             mistakesCount={averages.recent?.mistakes}
-            isLoading={isAveragesLoading}
+            isLoading={isMainLoading}
           />
         </div>
 
@@ -72,7 +72,7 @@ export function UserProfile() {
             speed={averages.allTime?.speed}
             accuracy={averages.allTime?.accuracy}
             mistakesCount={averages.allTime?.mistakes}
-            isLoading={isAveragesLoading}
+            isLoading={isMainLoading}
           />
         </div>
 
@@ -90,6 +90,7 @@ export function UserProfile() {
             goToPage={goToPage}
             matchScores={matchScores}
             matchOffset={matchOffset}
+            isLoading={isMatchScoresLoading}
           />
         </div>
 
@@ -100,7 +101,10 @@ export function UserProfile() {
             BEST SCORES
           </div>
 
-          <BestScores bestScores={bestScores} />
+          <BestScores
+            bestScores={bestScores}
+            isLoading={isMainLoading}
+          />
         </div>
       </div>
     </div>

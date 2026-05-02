@@ -20,7 +20,12 @@ export function Banner({ username, bio, imageUrl, bestSpeed, playerRating, total
             !isLoading &&
             <>
               <span className={styles.tag}>USER</span>
-              <span>{username}</span>            
+              {
+                username ? <span>{username}</span>
+                : <span className={styles.emptyField}>
+                    404 NOT FOUND
+                  </span>
+              }
             </>
           }
         </div>
@@ -29,7 +34,12 @@ export function Banner({ username, bio, imageUrl, bestSpeed, playerRating, total
             !isLoading &&
             <>
               <span className={styles.tag}>BIO</span>
-              <span>{bio}</span>            
+              {
+                bio ? <span>{bio}</span>
+                : <span className={styles.emptyField}>
+                    This user doesn't have a bio.
+                  </span>
+              }
             </>
           }
         </div>

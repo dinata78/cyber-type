@@ -3,7 +3,7 @@ import { MatchScore } from "../MatchScore/MatchScore";
 import { useMatchScores } from "../../../custom-hooks/useMatchScores";
 import { useEffect, useLayoutEffect, useRef } from "react";
 
-export function MatchHistory({ username, currentPage, totalPage, goToPage, matchScores, matchOffset }) {
+export function MatchHistory({ username, currentPage, totalPage, goToPage, matchScores, matchOffset, isLoading }) {
 
   const matchEndRef = useRef(null);
   const newestButtonRef = useRef(null);
@@ -36,6 +36,7 @@ export function MatchHistory({ username, currentPage, totalPage, goToPage, match
 
       <div className={styles.scoreWrapper}>
         {
+          !isLoading &&
           sortedMatchScores.map((score, index) => {            
             return (
               <MatchScore

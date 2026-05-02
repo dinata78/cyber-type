@@ -13,7 +13,7 @@ export function Averages({ speed, accuracy, mistakesCount, isLoading }) {
 
           <div className={styles.wrapper}>
             <span className={styles.label}>Accuracy</span>
-            <span>{accuracy|| 0}%</span>
+            <span>{accuracy || 0}%</span>
           </div>
 
           <div className={styles.wrapper}>
