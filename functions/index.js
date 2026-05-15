@@ -6,6 +6,7 @@ const {getFirestore, Timestamp} = require("firebase-admin/firestore");
 const {setGlobalOptions} = require("firebase-functions");
 const {onCall} = require("firebase-functions/v2/https");
 const { runTransaction } = require("firebase/firestore");
+const { onDocumentWritten } = require("firebase-functions/firestore");
 
 const firebaseApiKey = "AIzaSyCUk7_Hao2fzi46IbQsITtbWFgT25vwwXg";
 
@@ -15,6 +16,8 @@ setGlobalOptions({
   maxInstances: 10,
   region: "asia-northeast1",
 });
+
+const db = getFirestore();
 
 exports.signup = onCall(async (request) => {
   const { email, username, password } = request.data;
@@ -56,7 +59,7 @@ exports.signup = onCall(async (request) => {
 
   // Check whether username key exists
   const doc =
-    await getFirestore()
+    await db
     .collection("usernames")
     .doc(usernameKey)
     .get();
@@ -93,17 +96,18 @@ exports.signup = onCall(async (request) => {
 
   // Store user's data to Firestore
   try {
-    const batch = getFirestore().batch();
+    const batch = db.batch();
 
-    const userRef = getFirestore().collection("users").doc(userRecord.uid);
-    const usernameRef = getFirestore().collection("usernames").doc(usernameKey);
-    const emailRef = getFirestore().collection("emails").doc(userRecord.uid);
+    const userRef = db.collection("users").doc(userRecord.uid);
+    const usernameRef = db.collection("usernames").doc(usernameKey);
+    const emailRef = db.collection("emails").doc(userRecord.uid);
 
     // Store user's data
     batch.set(userRef,{
       uid: userRecord.uid,
       username: userRecord.displayName,
       bio: "",
+      imageUrl: "",
     });
 
     // Map username key to uid 
@@ -141,7 +145,7 @@ exports.getLoginToken = onCall(async (request) => {
   const usernameKey = username.replaceAll(/\s+/g, " ").trim().toLowerCase();
 
   try {
-    const usernameRef = getFirestore().collection("usernames").doc(usernameKey);
+    const usernameRef = db.collection("usernames").doc(usernameKey);
     const usernameSnapshot = await usernameRef.get();
 
     if (!usernameSnapshot.exists) {
@@ -150,7 +154,7 @@ exports.getLoginToken = onCall(async (request) => {
 
     const uid = usernameSnapshot.data().uid;
 
-    const emailRef = getFirestore().collection("emails").doc(uid);
+    const emailRef = db.collection("emails").doc(uid);
     const emailDoc = await emailRef.get();
     const email = emailDoc.data().email;
 
@@ -198,36 +202,60 @@ exports.recordMatchResult = onCall(async (request) => {
     || !quoteDifficulty
     || !speed
     || !accuracy
-    || mistakes === null
+    || !Number.isInteger(mistakes)
   ) {
     return { ok: false, code: "EMPTY_FIELDS" }
   }
 
-  if (mistakes === 0 && accuracy !== 100) {
+  if (
+    typeof speed !== "number"
+    || speed <= 0
+    || speed > 400
+  ) {
     return { ok: false, code: "INVALID_DATA" }
   }
 
-  if (speed > 400) {
-    return { ok: false, code: "TOO_FAST" }
+  if (
+    typeof accuracy !== "number"
+    || accuracy <= 0
+    || accuracy > 100
+  ) {
+    return { ok: false, code: "INVALID_DATA" }
+  }
+
+  if (
+    typeof mistakes !== "number"
+    || mistakes < 0 
+  ) {
+    return { ok: false, code: "INVALID_DATA" }
+  }
+
+  if (
+    accuracy === 100 && mistakes > 0
+    || accuracy !== 100 && mistakes === 0
+  ) {
+    return { ok: false, code: "INVALID_DATA" }
   }
 
   const playerName = request.auth.token.name;
   const usernameKey = playerName.toLowerCase();
 
   // Declare References
-  const quoteBestRef = getFirestore().collection("quoteBest").doc(quoteId);
-  const matchHistoryRef = getFirestore().collection("matchHistory").doc(usernameKey);
-  const measurementsRef = getFirestore().collection("measurements").doc(usernameKey);
-  const bestScoresRef = getFirestore().collection("bestScores").doc(usernameKey);
+  const quoteBestRef = db.collection("quoteBest").doc(quoteId);
+  const bestScoresRef = db.collection("bestScores").doc(usernameKey);
+  const bestSpeedsRef = db.collection("bestSpeeds").doc(usernameKey);
+  const measurementsRef = db.collection("measurements").doc(usernameKey);
+  const matchHistoryRef = db.collection("matchHistory").doc(usernameKey);
   
   // Logic
   try {
-    await getFirestore().runTransaction(async (tx) => {
+    await db.runTransaction(async (tx) => {
       // Read Data
       const quoteBestSnapshot = await tx.get(quoteBestRef);
-      const matchHistorySnapshot = await tx.get(matchHistoryRef);
-      const measurementsSnapshot = await tx.get(measurementsRef);
       const bestScoresSnapshot = await tx.get(bestScoresRef);
+      const bestSpeedsSnapshot = await tx.get(bestSpeedsRef);
+      const measurementsSnapshot = await tx.get(measurementsRef);
+      const matchHistorySnapshot = await tx.get(matchHistoryRef);
 
       const historyMeta = matchHistorySnapshot.data() || { latestPage: 1, countInLatest: 0 };
       const latestPageRef = matchHistoryRef.collection("pages").doc(`page-${historyMeta.latestPage}`);
@@ -238,6 +266,7 @@ exports.recordMatchResult = onCall(async (request) => {
       let newQuoteBest;
       let newBestScores;
       let newBestSpeed;
+      let newBestSpeeds;
       let newMeasurements;
       let newMatchScores;
       let newHistoryMeta;
@@ -245,7 +274,7 @@ exports.recordMatchResult = onCall(async (request) => {
       // Compute New Quote Best
       const quoteBestData = quoteBestSnapshot.data();
       
-      const quoteBest = quoteBestData?.bestScores || [];
+      const quoteBest = quoteBestData?.scores || [];
 
       const newQuoteBestScore = {
         playerName,
@@ -253,62 +282,48 @@ exports.recordMatchResult = onCall(async (request) => {
         createdAt: Timestamp.now(),
       }
 
-      if (quoteBest.length >= 10) {
-        newQuoteBest = quoteBest.slice(0, 10).toSorted((a, b) => b.speed - a.speed);
+      newQuoteBest = [...quoteBest, newQuoteBestScore]
+        .toSorted((a, b) => b.speed - a.speed)
+        .slice(0, 10);
 
-        const slowestData = newQuoteBest.pop();
-
-        if (newQuoteBestScore.speed > slowestData.speed) {
-          newQuoteBest.push(newQuoteBestScore);
-        }
-        else {
-          newQuoteBest.push(slowestData);
-        }
-      }
-      else {
-        newQuoteBest = [...quoteBest];
-
-        newQuoteBest.push(newQuoteBestScore);
-      }
-
-      // Compute New Best Scores and Speed
+      // Compute New Best Scores and Best Speed
       const best = bestScoresSnapshot.data()
-        || { bestScores: [], bestSpeed: 0 }
+        || { scores: [], bestSpeed: 0 }
 
-      const sortedBestScores = best.bestScores.toSorted((a, b) => b.speed - a.speed);
+      const bestScores = best.scores;
+      const bestSpeed = best.bestSpeed;
 
-      const newScore = {
+      const newBestScore = {
         origin: quoteOrigin,
         difficulty: quoteDifficulty,
         speed,
         createdAt: Timestamp.now(),
       }
 
-      if (sortedBestScores.length >= 10) {
-        newBestScores = [...sortedBestScores].slice(0, 10);
+      newBestScores = [...bestScores, newBestScore]
+        .toSorted((a, b) => b.speed - a.speed)
+        .slice(0, 10);
 
-        const slowestData = newBestScores.pop();
+      newBestSpeed = speed > best.bestSpeed ? speed : best.bestSpeed;
 
-        if (newScore.speed > slowestData.speed) {
-          newBestScores.push(newScore);
-        }
-        else {
-          newBestScores.push(slowestData);
-        }
+      // Compute New Best Speed For Each Difficulty
+      const bestSpeeds = bestSpeedsSnapshot.data()
+        ||  {
+              playerName,
+              speed: { All: 0, Easy: 0, Medium: 0, Hard: 0 }
+            }
+      
+      const allDiffSpeed = bestSpeeds.speed["All"] || 0;
+      const currentDiffSpeed = bestSpeeds.speed[quoteDifficulty] || 0;
+
+      newBestSpeeds = structuredClone(bestSpeeds);
+
+      if (speed > allDiffSpeed) {
+        newBestSpeeds.speed["All"] = speed;
       }
-      else {
-        newBestScores = [...sortedBestScores];
 
-        newBestScores.push(newScore);
-      }
-
-      const bestSpeed = best.bestSpeed;
-
-      if (newScore.speed > bestSpeed) {
-        newBestSpeed = newScore.speed;
-      }
-      else {
-        newBestSpeed = bestSpeed;
+      if (speed > currentDiffSpeed) {
+        newBestSpeeds.speed[quoteDifficulty] = speed;
       }
 
       // Compute New Measurements
@@ -322,26 +337,13 @@ exports.recordMatchResult = onCall(async (request) => {
           last25MistakesArray: [],
         }
       
-      const newSpeedArray = [...measurements.last25SpeedArray];
-      const newAccuracyArray = [...measurements.last25AccuracyArray];
-      const newMistakesArray = [...measurements.last25MistakesArray];
+      const newSpeedArray = [...measurements.last25SpeedArray, speed];
+      const newAccuracyArray = [...measurements.last25AccuracyArray, accuracy];
+      const newMistakesArray = [...measurements.last25MistakesArray, mistakes];
 
-
-      if (newSpeedArray.length >= 25) {
-        newSpeedArray.shift();
-      }
-
-      if (newAccuracyArray.length >= 25) {
-        newAccuracyArray.shift();
-      }
-
-      if (newMistakesArray.length >= 25) {
-        newMistakesArray.shift();
-      }
-
-      newSpeedArray.push(speed);
-      newMistakesArray.push(mistakes);
-      newAccuracyArray.push(accuracy);
+      if (newSpeedArray.length >  25) newSpeedArray.shift();
+      if (newAccuracyArray.length > 25) newAccuracyArray.shift();
+      if (newMistakesArray.length > 25) newMistakesArray.shift();
 
       newMeasurements = {
         totalSpeed: measurements.totalSpeed + speed,
@@ -353,7 +355,7 @@ exports.recordMatchResult = onCall(async (request) => {
       };
 
       // Compute New Match Scores
-      const newMatch = {
+      const newMatchScore = {
         origin: quoteOrigin,
         difficulty: quoteDifficulty,
         speed,
@@ -364,9 +366,9 @@ exports.recordMatchResult = onCall(async (request) => {
       if (historyMeta.countInLatest < 25) {
         const latestPageData = latestPageSnapshot.data();
 
-        const existingMatches = latestPageData?.matchScores || [];
+        const existingMatches = latestPageData?.scores || [];
 
-        newMatchScores = [...existingMatches, newMatch];
+        newMatchScores = [...existingMatches, newMatchScore];
 
         newHistoryMeta = {
           latestPage: historyMeta.latestPage,
@@ -376,7 +378,7 @@ exports.recordMatchResult = onCall(async (request) => {
       else {
         const nextPageNumber = historyMeta.latestPage + 1;
 
-        newMatchScores = [newMatch];
+        newMatchScores = [newMatchScore];
 
         newHistoryMeta = {
           latestPage: nextPageNumber,
@@ -385,18 +387,22 @@ exports.recordMatchResult = onCall(async (request) => {
       }
 
       // Write Data To Firestore
-      tx.set(quoteBestRef, { bestScores: newQuoteBest });
+      tx.set(quoteBestRef, { scores: newQuoteBest });
 
       tx.set(bestScoresRef, {
-        bestScores: newBestScores,
+        scores: newBestScores,
         bestSpeed: newBestSpeed,
       });
+
+      if (speed > allDiffSpeed || speed > currentDiffSpeed) {
+        tx.set(bestSpeedsRef, newBestSpeeds);
+      }
 
       tx.set(measurementsRef, newMeasurements);
 
       const pageRef = matchHistoryRef.collection("pages").doc(`page-${newHistoryMeta.latestPage}`);
 
-      tx.set(pageRef, { matchScores: newMatchScores });
+      tx.set(pageRef, { scores: newMatchScores });
 
       tx.set(matchHistoryRef, {
         latestPage: newHistoryMeta.latestPage,
@@ -409,4 +415,46 @@ exports.recordMatchResult = onCall(async (request) => {
   }
 
   return { ok: true, code: "MATCH_RESULT_RECORDED" }
+});
+
+const updateLeaderboard = async (playerName, difficulties, speed) => {
+  const leaderboardRef = db.collection("leaderboard").doc(difficulties.toLowerCase());
+
+  await db.runTransaction(async (tx) => {
+    const leaderboardSnapshot = await tx.get(leaderboardRef);
+    const leaderboardEntries = leaderboardSnapshot.data()?.scores || [];
+
+    const filteredEntries = leaderboardEntries.filter(i => i.playerName !== playerName);
+    const isNotFastEnough = filteredEntries.length >= 100 && speed < filteredEntries[99].speed;
+
+    if (isNotFastEnough) return;
+
+    const newLeaderboardEntries =
+      [
+        ...filteredEntries,
+        { playerName, speed, createdAt: Timestamp.now() }
+      ]
+      .toSorted((a, b) => b.speed - a.speed)
+      .slice(0, 100);
+
+    tx.set(leaderboardRef, { scores: newLeaderboardEntries });
+  });
+}
+
+exports.onBestSpeedsChange = onDocumentWritten("bestSpeeds/{usernameKey}", async (event) => {
+  const bestSpeeds = event.data.after.data()?.speed;
+
+  const previousSpeeds = event.data.before.data()?.speed
+    ||  { All: 0, Easy: 0, Medium: 0, Hard: 0 }
+
+  if (!bestSpeeds) return;
+
+  const playerName = event.data.after.data().playerName;
+  const difficulties = ["All", "Easy", "Medium", "Hard"];
+
+  await Promise.all(
+    difficulties
+      .filter(diff => bestSpeeds[diff] > previousSpeeds[diff])
+      .map(diff => updateLeaderboard(playerName, diff, bestSpeeds[diff]))
+  );
 });

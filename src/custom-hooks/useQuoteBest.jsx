@@ -12,9 +12,9 @@ export function useQuoteBest(quoteId) {
 
     const unsubscribe = onSnapshot(docRef, snapshot => {
       if (snapshot.exists()) {
-        const bestScores = snapshot.data()?.bestScores || [];
+        const quoteBest = snapshot.data()?.scores || [];
 
-        setQuoteBest(bestScores);
+        setQuoteBest(quoteBest);
       }
       else {
         setQuoteBest([]);

@@ -37,7 +37,8 @@ export function MatchHistory({ username, currentPage, totalPage, goToPage, match
       <div className={styles.scoreWrapper}>
         {
           !isLoading &&
-          sortedMatchScores.map((score, index) => {            
+          matchOffset >= 0 &&
+          sortedMatchScores.map((score, index) => {
             return (
               <MatchScore
                 key={score.createdAt - index}

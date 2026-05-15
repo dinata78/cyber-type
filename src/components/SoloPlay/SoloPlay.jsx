@@ -128,7 +128,7 @@ export function SoloPlay() {
 
         <div className={styles.right}>
           <QuoteLeaderboard
-            bestScores={quoteBest}
+            quoteBest={quoteBest}
           />
         </div>
       </div>      

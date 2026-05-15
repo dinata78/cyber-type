@@ -9,7 +9,7 @@ export function useMatchScores(username) {
   const [isLoading, setIsLoading] = useState(true);
 
   const currentPage = Number(searchParams.get("matchPage"));
-  const matchOffset = (currentPage - 1) * 25; 
+  const matchOffset = (currentPage - 1) * 25;
 
   const goToPage = (newPage, currentPage, totalPage) => {
     if (
@@ -36,7 +36,7 @@ export function useMatchScores(username) {
         const snapshot = await getDoc(docRef);
 
         if (snapshot.exists()) {
-          const matchScores = snapshot.data()?.matchScores || [];
+          const matchScores = snapshot.data()?.scores || [];
 
           setMatchScores(matchScores);
         }

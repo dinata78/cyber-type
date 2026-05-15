@@ -1,0 +1,102 @@
+
+/* Layout CSS */
+
+.mainContainer {
+  flex-grow: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.wrapper {
+  width: 600px;
+  height: 800px;
+  display: flex;
+  flex-direction: column;
+}
+
+.difficulties {
+  min-height: 48px;
+  max-height: 48px;
+  display: flex;
+}
+
+.btn {
+  flex-grow: 1;
+  height: 100%;
+}
+
+.header {
+  min-height: 36px;
+  max-height: 36px;
+  margin-inline: 16px;
+  padding-inline: 12px;
+  display: flex;
+}
+
+.number {
+  width: 60px;
+}
+
+.player {
+  flex-grow: 1;
+  display: flex;
+  align-items: center;
+}
+
+.date {
+  width: 180px;
+}
+
+.speed {
+  width: 96px;
+}
+
+.number, .date, .speed {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.scoreWrapper {
+  flex-grow: 1;
+  overflow-y: scroll;
+  margin: 16px;
+  margin-top: 0;
+  padding-left: 12px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Visual CSS */
+
+.wrapper {
+  background-color: #222;
+}
+
+.btn {
+  background-color: transparent;
+  border: none;
+  border-bottom: 1px solid #667;
+  color: #667;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.btn.current,
+.btn:hover {
+  color: var(--color-one);
+  border-bottom-color: var(--color-one);
+}
+
+.header {
+  color: #aab;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.scoreWrapper {
+  border: 1px solid #667;
+  scrollbar-width: thin;
+  scrollbar-color: #aab transparent;
+}

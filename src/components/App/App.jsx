@@ -6,16 +6,17 @@ import { Header } from "../header/Header/Header"
 import { Lobby } from "../lobby/Lobby/Lobby"
 import { SoloPlay } from "../SoloPlay/SoloPlay"
 import { UserProfile } from "../user-profile/UserProfile/UserProfile"
+import { Leaderboard } from "../leaderboard/Leaderboard/Leaderboard"
 
 function App() {
   return (
     <div className={styles.mainContainer}>
       <Header />
-
       <Routes>
         <Route path="/" element={<Lobby />} />
         <Route path="/solo" element={<SoloPlay />} />
         <Route path="/user/:username" element={<UserProfile />} />
+        <Route path="/leaderboard" element={<Leaderboard />} />
       </Routes>
     </div>
   )

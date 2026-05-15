@@ -1,0 +1,49 @@
+
+/* Layout CSS */
+
+.mainContainer {
+  min-height: 60px;
+  max-height: 60px;
+  display: flex;
+}
+
+.number {
+  width: 60px;
+}
+
+.player {
+  flex-grow: 1;
+  display: flex;
+  align-items: center;
+}
+
+.date {
+  width: 180px;
+}
+
+.speed {
+  width: 96px;
+}
+
+.number, .date, .speed {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Visual CSS */
+
+.mainContainer {
+  border-bottom: 1px solid #667;
+  color: white;
+  font-size: 16px;
+}
+
+.player {
+  color: var(--color-two);
+  text-decoration: underline;
+}
+
+.player > span {
+  cursor: pointer;
+}

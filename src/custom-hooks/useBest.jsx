@@ -28,7 +28,7 @@ export function useBest(username) {
         const snapshot = await getDoc(docRef);
 
         if (snapshot.exists()) {
-          const bestScores = snapshot.data()?.bestScores || [];
+          const bestScores = snapshot.data()?.scores || [];
           const bestSpeed = snapshot.data()?.bestSpeed || 0;
 
           setBestScores(bestScores);
